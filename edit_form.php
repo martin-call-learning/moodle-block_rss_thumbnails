@@ -45,11 +45,14 @@ class block_rss_thumbnails_edit_form extends block_rss_client_edit_form {
 
         $mform->addElement('text', 'config_carousselspeed', get_string('carousselspeed', 'block_rss_thumbnails'));
         $mform->setDefault('config_carousselspeed', block_rss_thumbnails::DEFAULT_CAROUSSEL_SPEED);
+        $mform->setType('config_carousselspeed', PARAM_INT);
 
         $mform->addElement('selectyesno', 'config_show_channel_link', get_string('clientshowchannellinklabel', 'block_rss_client'));
-        $mform->setDefault('config_show_channel_link', 0);
+        $mform->setDefault('config_show_channel_link', false);
+        $mform->setType('config_show_channel_link', PARAM_BOOL);
 
-        $mform->addElement('selectyesno', 'config_remove_image_size_suffix', get_string('removeimagesizesuffix', 'block_rss_client'));
-        $mform->setDefault('config_remove_image_size_suffix', 0);
+        $mform->addElement('selectyesno', 'config_remove_image_size_suffix', get_string('removeimagesizesuffix', 'block_rss_thumbnails'));
+        $mform->setDefault('config_remove_image_size_suffix', false);
+        $mform->setType('config_remove_image_size_suffix', PARAM_BOOL);
     }
 }

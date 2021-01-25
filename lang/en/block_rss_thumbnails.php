@@ -27,3 +27,4 @@ $string['rss_thumbnails:myaddinstance'] = 'Add a RSS Thumnail block to my moodle
 $string['pluginname'] = 'RSS Thumnail';
 $string['title'] = 'RSS Thumnail';
 $string['carousselspeed'] = 'Caroussel speed';
+$string['removeimagesizesuffix'] = 'Remove image size suffix (wordpress RSS).';
