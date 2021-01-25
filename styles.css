@@ -1,0 +1,12 @@
+.block_rss_thumbnails .slide-title {
+    padding: 80px 30px 25px;
+    width: 100%;
+    min-height: 200px;
+}
+.block_rss_thumbnails .categories {
+    font-size: x-small;
+}
+
+.block_rss_thumbnails .thumbnail {
+    min-height: 350px;
+}
