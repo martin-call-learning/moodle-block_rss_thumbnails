@@ -193,7 +193,10 @@ class block_rss_thumbnails extends block_rss_client {
         }
 
         if ($simplepiefeed->error()) {
-            debugging($feedrecord->url . ' Failed with code: ' . $simplepiefeed->error());
+            if (!defined('BEHAT_SITE_RUNNING')) {
+                // No error while doing the behat tests.
+                debugging($feedrecord->url . ' Failed with code: ' . $simplepiefeed->error());
+            }
             return null;
         }
 
