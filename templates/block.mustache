@@ -30,6 +30,7 @@
 
     Example context (json):
     {
+        "carousselspeed": 1,
         "feeds": [
             {
                 "title": "News from around my living room",
@@ -98,7 +99,7 @@
                             <li class="glide__slide">
                                 <a href="{{ link }}" class="d-block position-relative thumbnail">
                                     {{#imageurl}}
-                                        <img src="{{imageurl}}" class="img-thumbnail"/>
+                                        <img src="{{imageurl}}" class="img-thumbnail" alt="Item image"/>
                                     {{/imageurl}}
                                     <div class="slide-title d-block">
                                         <div class="font-weight-bolder  d-none d-md-block">{{ title }}</div>
@@ -126,6 +127,7 @@
                 gap: 20,
                 autoplay: {{ carousselspeed }}
             }
-          );
+        );
     });
 {{/js}}
+</div>

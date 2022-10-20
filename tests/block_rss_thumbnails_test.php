@@ -18,19 +18,25 @@
  * Base class for unit tests for block_rss_thumbnails.
  *
  * @package   block_rss_thumbnails
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace block_rss_thumbnails;
 
-use block_thumblinks_action\output\thumblinks_action;
-use block_rss_thumbnails\feed_manager;
-
-defined('MOODLE_INTERNAL') || die();
+use advanced_testcase;
+use block_base;
+use block_rss_client\task\refreshfeeds;
+use context_system;
+use dml_exception;
+use moodle_page;
+use moodle_simplepie;
+use SimplePie_File;
+use stdClass;
 
 /**
- * Unit tests for block_rss_thumbnails
+ * Unit tests for block_rss_thumbnails.
  *
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_rss_thumbnails_test extends advanced_testcase {
@@ -39,55 +45,53 @@ class block_rss_thumbnails_test extends advanced_testcase {
      * Expected config data.
      */
     const EXPECTED_CONFIG = '[{"imageurl":"http:\/\/mysite.fr\/wp-content\/uploads\/2020\/11\/DSC_0009-2-480x519.jpg",'
-    .'"linkurl":"http:\/\/mysite.fr\/la-sante-globale-fil-conducteur-de-la-strategie-detablissement\/",'
-    .'"categories":[{"text":"One Health"}],"date":"1604419500","title":"La sant\u00e9 globale, fil conducteur de la strat\u00e9gie'
-    .' d\u2019\u00e9tablissement"},{"imageurl":"http:\/\/mysite.fr\/wp-content\/uploads\/2020\/10\/Rentree-VETO-2020-1024x504.jpg"'
-    .',"linkurl":"http:\/\/mysite.fr\/les-chiffres-cles-de-la-rentree-2020-de-vetagro-sup\/","categories":[{"text":"Etudiants"}'
-    .',{"text":"Formations"}],"date":"1603116642","title":"Les chiffres cl\u00e9s de la rentr\u00e9e 2020 de VetAgro Sup"}]';
+    . '"linkurl":"http:\/\/mysite.fr\/la-sante-globale-fil-conducteur-de-la-strategie-detablissement\/",'
+    . '"categories":[{"text":"One Health"}],"date":"1604419500","title":"La sant\u00e9 globale, fil conducteur de la strat\u00e9gie'
+    . ' d\u2019\u00e9tablissement"},{"imageurl":"http:\/\/mysite.fr\/wp-content\/uploads\/2020\/10\/Rentree-VETO-2020-1024x504.jpg"'
+    . ',"linkurl":"http:\/\/mysite.fr\/les-chiffres-cles-de-la-rentree-2020-de-vetagro-sup\/","categories":[{"text":"Etudiants"}'
+    . ',{"text":"Formations"}],"date":"1603116642","title":"Les chiffres cl\u00e9s de la rentr\u00e9e 2020 de VetAgro Sup"}]';
 
     /**
-     * Current block
-     *
-     * @var block_base|false|null
+     * @var block_base|false|null Current block
      */
     protected $block = null;
     /**
-     * Current user
-     *
-     * @var stdClass|null
+     * @var stdClass|null Current user
      */
     protected $user = null;
+
+    /** @var array|object Feed record */
+    private $record;
 
     /**
      * Basic setup for these tests.
      */
-    public function setUp() {
-        global $DB;
-        $this->resetAfterTest(true);
+    public function setUp(): void {
+        global $DB, $CFG;
+        $this->resetAfterTest();
 
         // Insert a new RSS Feed.
-        require_once("{$CFG->libdir}/simplepie/moodle_simplepie.php");
+        require_once("$CFG->libdir/simplepie/moodle_simplepie.php");
 
-        $time = time();
         // A record that has failed before.
-        $record = (object) [
+        $this->record = (object) [
             'userid' => 1,
             'title' => 'Skip test feed',
             'preferredtitle' => '',
             'description' => 'A feed to test the skip time.',
             'shared' => 0,
-            'url' => 'http://example.com/rss',
+            'url' => '',
             'skiptime' => 0,
             'skipuntil' => 0,
         ];
-        $record->id = $DB->insert_record('block_rss_client', $record);
+        $this->record->id = $DB->insert_record('block_rss_client', $this->record);
 
         // Run the scheduled task and have it fail.
-        $task = $this->getMockBuilder(\block_rss_client\task\refreshfeeds::class)
+        $task = $this->getMockBuilder(refreshfeeds::class)
             ->setMethods(['fetch_feed'])
             ->getMock();
 
-        $piemock = $this->getMockBuilder(\moodle_simplepie::class)
+        $piemock = $this->getMockBuilder(moodle_simplepie::class)
             ->setMethods(['error'])
             ->getMock();
 
@@ -96,7 +100,6 @@ class block_rss_thumbnails_test extends advanced_testcase {
 
         $task->method('fetch_feed')
             ->willReturn($piemock);
-
 
         $this->user = $this->getDataGenerator()->create_user();
         $this->setUser($this->user);
@@ -121,81 +124,153 @@ class block_rss_thumbnails_test extends advanced_testcase {
         $blocks = $page->blocks->get_blocks_for_region($page->blocks->get_default_region());
         $block = end($blocks);
         $block = block_instance($blockname, $block->instance);
-        $this->block = $block;
-        $block = block_instance_by_id($this->block->instance->id);
-        $configdata = (object) feed_manager::DEFAULT_VALUES;
+        $configdata = ['display_description' => true];
         $block->instance_config_save((object) $configdata);
         $this->block = $block;
+        $block = block_instance_by_id($this->block->instance->id);
+        $this->block = $block;
     }
 
     /**
-     * Test that we can retrieve an article from a feedd
+     * Tests if the feed returned by {@see \block_rss_thumbnails::get_feed()} method is valid.
+     *
+     * @return void
+     * @covers \block_rss_thumbnails::get_feeds
      */
-    public function test_get_articles_from_page() {
+    public function test_get_feed() {
         global $CFG;
-        // We need to reload the block so config is there.
-        $block = block_instance_by_id($this->block->instance->id);
-        $feedmanager = new mock_feed_manager($block);
-        $content = file_get_contents($CFG->dirroot.'/blocks/rss_thumbnails/tests/fixtures/sample-feed.txt');
-        $settings = $feedmanager->get_articles_from_page($content);
-        $this->assertEquals(json_decode(self::EXPECTED_CONFIG), $settings);
+
+        $rssfeed = (object) [
+            'skipuntil' => 0,
+            'fileurl' => new SimplePie_File($CFG->dirroot . '/blocks/rss_thumbnails/tests/fixtures/sample-feed.xml')
+        ];
+
+        $feed = $this->block->get_feed($rssfeed, 5, true);
+        $exporteddata = $feed->export_for_template(
+            $this->block->page->get_renderer('block_rss_thumbnails')
+        );
+        $this->assertEquals("IMT", $exporteddata['title']);
+        $this->assertNull($exporteddata['image']);
     }
 
+    /**
+     * Tests if the items of the feed returned by the {@see \block_rss_thumbnails::get_feed()} method are valid.
+     *
+     * @return void
+     * @covers \block_rss_thumbnails::get_feed
+     */
+    public function test_get_feed_items() {
+        global $CFG;
+        $rssfeed = (object) [
+            'skipuntil' => 0,
+            'fileurl' => new SimplePie_File($CFG->dirroot . '/blocks/rss_thumbnails/tests/fixtures/sample-feed.xml')
+        ];
+
+        $feed = $this->block->get_feed($rssfeed, 5, true);
+        $exporteddata = $feed->export_for_template(
+            $this->block->page->get_renderer('block_rss_thumbnails')
+        );
+        $expecteditems = self::get_expected_items();
+        $items = $exporteddata["items"];
+        for ($index = 0; $index < count($expecteditems); $index++) {
+            self::assertEquals($expecteditems[$index], $items[$index]);
+        }
+
+    }
 
     /**
-     * Test that output is as expected. This also test file loading into the plugin.
+     * Get expected items to be returned by the get_feed.
+     *
+     * @return array[]
      */
-    public function test_simple_content() {
-        // We need to reload the block so config is there.
-        $block = block_instance_by_id($this->block->instance->id);
-        $block->config->articles = json_decode(self::EXPECTED_CONFIG);
-        $block->instance_config_save($block->config);
-        $content = $block->get_content();
-        $this->assertNotNull($content->text);
-
-        $expected = '<div class="block-vetagro-news block-cards">
-    <div class="container-fluid">
-        <div class="glide d-none">
-            <div class="glide__track" data-glide-el="track">
-                <ul class="glide__slides">
-                        <li class="glide__slide">
-                            <a href="http://mysite.fr/la-sante-globale-fil-conducteur-de-la-strategie-detablissement/"'
-            .' class="d-block position-relative">
-                                <img class="img-fluid w-100"'
-            .' src="http://mysite.fr/wp-content/uploads/2020/11/DSC_0009-2-480x519.jpg"/>
-                                <div class="slide-content position-absolute fixed-bottom">
-                                    <div class="categories font-italic d-none d-md-inline-block">
-                                            <span class="btn btn-primary">One Health</span>
-                                    </div>
-                                    <div class="text-white text-truncate  d-none d-md-inline-block">4 November 2020</div>
-                                    <div class="font-weight-bolder text-white text-truncate  d-none d-md-inline-block">'
-            .'La santé globale, fil conducteur de la stratégie d’établissement</div>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="glide__slide">
-                            <a href="http://mysite.fr/les-chiffres-cles-de-la-rentree-2020-de-vetagro-sup/" '
-            .'class="d-block position-relative">
-                                <img class="img-fluid w-100" '
-            .'src="http://mysite.fr/wp-content/uploads/2020/10/Rentree-VETO-2020-1024x504.jpg"/>
-                                <div class="slide-content position-absolute fixed-bottom">
-                                    <div class="categories font-italic d-none d-md-inline-block">
-                                            <span class="btn btn-primary">Etudiants</span>
-                                            <span class="btn btn-primary">Formations</span>
-                                    </div>
-                                    <div class="text-white text-truncate  d-none d-md-inline-block">19 October 2020</div>
-                                    <div class="font-weight-bolder text-white text-truncate  d-none d-md-inline-block">'
-            .'Les chiffres clés de la rentrée 2020 de VetAgro Sup</div>
-                                </div>
-                            </a>
-                        </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>';
-        $text = preg_replace('/ id="block-vetagro-news([^"]+)"/i', '', $content->text);
-        $this->assertEquals($expected, $text);
+    final private static function get_expected_items() {
+        return [
+            [
+                "id" => "https://www.imt.fr/?p=89572",
+                "permalink" => "https://www.imt.fr/odyssea-les-personnels-de-linstitut-mines-telecom-mobilises-pour".
+                    "-la-lutte-contre-le-cancer-du-sein/",
+                "timestamp" => strtotime("Wed, 19 Oct 2022 13:57:11 +0000"),
+                "link" => "https://www.imt.fr/odyssea-les-personnels-de-linstitut-mines-telecom-mobilises-pour".
+                    "-la-lutte-contre-le-cancer-du-sein/",
+                "imageurl" => "https://www.imt.fr/wp-content/uploads/2022/10/Odyssea2022_montage-groupes-80x80.png",
+                "categories" => [
+                    "À la une",
+                    "Actualités",
+                    "course",
+                    "Odyssea"
+                ],
+                "title" => "Odyssea : les personnels de l’Institut Mines-Télécom mobilisés pour la lutte contre le cancer du sein",
+                "description" => "Dimanche 2 octobre s'est tenu la course Odyssea où l'Institut Mines-Télécom s'est mobilisé ".
+                    "pour soutenir la lutte contre le cancer du sein."
+            ], [
+                "id" => "https://www.imt.fr/?p=89556",
+                "permalink" => "https://www.imt.fr/nouvelles-start-up-beneficiaires-des-fonds-de-pret-dhonneur".
+                    "-imt-numerique-et-industrie-et-energie-4-0/",
+                "timestamp" => strtotime("Tue, 18 Oct 2022 14:34:00 +0000"),
+                "link" => "https://www.imt.fr/nouvelles-start-up-beneficiaires-des-fonds-de-pret-dhonneur".
+                    "-imt-numerique-et-industrie-et-energie-4-0/",
+                "imageurl" => "https://www.imt.fr/wp-content/uploads/2022/10/start-up-80x80.jpg",
+                "categories" => [
+                    "À la une",
+                    "Actualités",
+                    "prêts d'honneur",
+                    "start-up"
+                ],
+                "title" => "Nouvelles start-up bénéficiaires des fonds de prêt d’honneur IMT « Numérique » ".
+                    "et « Industrie et Energie 4.0 »",
+                "description" => "Le comité du Fonds IMT Numérique et du Fonds Industrie et Energie 4.0 et se sont réunis".
+                    " le 20 septembre et 11 octobre pour attribuer des prêts d'honneurs à de nouvelles start-up."
+            ], [
+                "id" => "https://www.imt.fr/?p=89147",
+                "permalink" => "https://www.imt.fr/suivez-les-lives-imt-pour-lindustrie-du-futur/",
+                "timestamp" => strtotime("Wed, 05 Oct 2022 12:59:57 +0000"),
+                "link" => "https://www.imt.fr/suivez-les-lives-imt-pour-lindustrie-du-futur/",
+                "imageurl" => "https://www.imt.fr/wp-content/uploads/2022/05/les-lives_IMT-industrie-du-futur_archer-80x80.png",
+                "categories" => [
+                    "À la une",
+                    "Actualités",
+                    "Live IMT industrie",
+                    "Live"
+                ],
+                "title" => "Suivez les Lives IMT pour l’industrie du futur ! Rendez-vous le 20 octobre à 18h30",
+                "description" => "L’Observatoire des métiers et des compétences de l’Institut Mines-Télécom propose," .
+                    " depuis mai, une nouvelle série de rendez-vous mensuels consacrés à l’industrie, portés par les " .
+                    "étudiantes et étudiants de ses écoles  : les Lives IMT pour l’industrie du futur !"
+            ], [
+                "id" => "https://www.imt.fr/?p=89403",
+                "permalink" => "https://www.imt.fr/2e-campagne-de-recrutement-2022-rejoignez-limt/",
+                "timestamp" => strtotime("Mon, 03 Oct 2022 10:40:07 +0000"),
+                "link" => "https://www.imt.fr/2e-campagne-de-recrutement-2022-rejoignez-limt/",
+                "imageurl" => "https://www.imt.fr/wp-content/uploads/2020/03/rejoindre_IMT-80x80.png",
+                "categories" => [
+                    "À la une",
+                    "Actualités",
+                    "CDD",
+                    "CDI",
+                    "emploi",
+                    "offre d'emploi",
+                    "recrutment"
+                ],
+                "title" => "2e campagne de recrutement 2022 : rejoignez l’IMT",
+                "description" => "Plus de 60 offres d’emploi en CDD ou CDI de droit public à pourvoir."
+            ], [
+                "id" => "https://www.imt.fr/?p=89382",
+                "permalink" => "https://www.imt.fr/le-fonds-imt-numerique-et-igeu-fetent-leurs-10-ans/",
+                "timestamp" => strtotime("Fri, 30 Sep 2022 14:00:40 +0000"),
+                "link" => "https://www.imt.fr/le-fonds-imt-numerique-et-igeu-fetent-leurs-10-ans/",
+                "imageurl" => "https://www.imt.fr/wp-content/uploads/2022/09/10_ans_fonds_honneur-80x80.jpg",
+                "categories" => [
+                    "À la une",
+                    "Actualités",
+                    "Communiqués de presse",
+                    "10 ans",
+                    "Fonds IMT Numérique"
+                ],
+                "title" => "Le Fonds IMT Numérique et IGEU fêtent leurs 10 ans",
+                "description" => "Il y a 10 ans, l’Institut Mines Télécom (IMT), la Fondation Mines-Télécom et la Caisse des" .
+                    " dépôts créaient Initiative Grandes Ecoles et Université (IGEU) et le Fonds IMT Numérique pour répondre au" .
+                    " besoin de financement de jeunes projets d’entreprise."
+            ],
+        ];
     }
 }
-

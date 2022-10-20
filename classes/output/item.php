@@ -23,9 +23,9 @@
  */
 
 namespace block_rss_thumbnails\output;
+use core_text;
 use moodle_url;
-
-defined('MOODLE_INTERNAL') || die();
+use renderer_base;
 
 /**
  * Class to help display an RSS Item
@@ -35,35 +35,34 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends \block_rss_client\output\item {
+    /** @var ?string The url of the RSS item's image  */
     protected $imageurl = null;
+
+    /** @var  ?array The categories of the RSS item*/
     protected $categories = null;
 
     /**
      * Contructor
      *
      * @param string $id The id of the RSS item
-     * @param \moodle_url $link The URL of the RSS item
+     * @param moodle_url $link The URL of the RSS item
      * @param string $title The title pf the RSS item
      * @param string $description The description of the RSS item
-     * @param \moodle_url $permalink The permalink of the RSS item
+     * @param moodle_url $permalink The permalink of the RSS item
      * @param int $timestamp The Unix timestamp that represents the published date
-     * @param boolean $showdescription Whether or not to show the description
+     * @param boolean $showdescription Whether to show the description
+     * @param string $imageurl the image's url of the item
+     * @param array $categories the categories of the item
      */
-    public function __construct($id, \moodle_url $link,
+    public function __construct($id, moodle_url $link,
         $title, $description,
-        \moodle_url $permalink,
+        moodle_url $permalink,
         $timestamp,
         $showdescription = true,
         $imageurl = null,
         $categories
     ) {
-        $this->id = $id;
-        $this->link = $link;
-        $this->title = $title;
-        $this->description = $description;
-        $this->permalink = $permalink;
-        $this->timestamp = $timestamp;
-        $this->showdescription = $showdescription;
+        parent::__construct($id, $link, $title, $description, $permalink, $timestamp, $showdescription);
         $this->imageurl = $imageurl;
         $this->categories = $categories;
     }
@@ -75,7 +74,7 @@ class item extends \block_rss_client\output\item {
      * @return array
      * @see templatable::export_for_template()
      */
-    public function export_for_template(\renderer_base $output) {
+    public function export_for_template(renderer_base $output) : array {
         $data = array(
             'id' => $this->id,
             'permalink' => clean_param($this->permalink, PARAM_URL),
@@ -89,7 +88,7 @@ class item extends \block_rss_client\output\item {
         $title = $this->title;
         if (!$title) {
             $title = strip_tags($this->description);
-            $title = \core_text::substr($title, 0, 20) . '...';
+            $title = core_text::substr($title, 0, 20) . '...';
         }
 
         // Allow the renderer to format the title and description.

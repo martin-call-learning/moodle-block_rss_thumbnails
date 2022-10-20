@@ -23,7 +23,8 @@
  */
 
 namespace block_rss_thumbnails\output;
-defined('MOODLE_INTERNAL') || die();
+
+use renderer_base;
 
 /**
  * Class to help display an RSS Feeds block
@@ -32,26 +33,28 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block extends \block_rss_client\output\block  {
+class block extends \block_rss_client\output\block {
 
-    protected $carousselspeed = 0;
+    /** @var int The delay between two slides */
+    protected int $carousselspeed = 0;
     /**
      * Contruct
      *
+     * @param int $carousselspeed the caroussel speed of the block
      * @param array $feeds An array of renderable feeds
      */
     public function __construct($carousselspeed, array $feeds = array()) {
-        $this->feeds = $feeds;
+        parent::__construct($feeds);
         $this->carousselspeed = $carousselspeed;
     }
 
     /**
      * Prepare data for use in a template
      *
-     * @param \renderer_base $output
+     * @param renderer_base $output
      * @return array
      */
-    public function export_for_template(\renderer_base $output) {
+    public function export_for_template(renderer_base $output): array {
         $data = parent::export_for_template($output);
         $data['carousselspeed'] = $this->carousselspeed;
         return $data;

@@ -22,7 +22,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use block_rss_client\output\channel_image;
+use block_rss_client\output\feed;
 use block_rss_thumbnails\output\block;
+use block_rss_thumbnails\output\item;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -37,6 +40,7 @@ require_once($CFG->dirroot . '/blocks/rss_client/block_rss_client.php');
  */
 class block_rss_thumbnails extends block_rss_client {
 
+    /** @var int The default caroussel speed */
     const DEFAULT_CAROUSSEL_SPEED = 4000;
 
     /** @var bool track whether any of the output feeds have recorded failures */
@@ -54,7 +58,7 @@ class block_rss_thumbnails extends block_rss_client {
     /**
      * Content for the block
      *
-     * @return \stdClass|string|null
+     * @return stdClass|string|null
      * @throws coding_exception
      */
     public function get_content() {
@@ -67,7 +71,7 @@ class block_rss_thumbnails extends block_rss_client {
             return $this->content;
         }
 
-        // initalise block content object
+        // Initialise block content object.
         $this->content = new stdClass;
         $this->content->text = '';
         $this->content->footer = '';
@@ -78,7 +82,7 @@ class block_rss_thumbnails extends block_rss_client {
 
         if (!isset($this->config)) {
             // The block has yet to be configured - just display configure message in
-            // the block if user has permission to configure it
+            // the block if user has permission to configure it.
 
             if (has_capability('block/rss_client:manageanyfeeds', $this->context)) {
                 $this->content->text = get_string('feedsconfigurenewinstance2', 'block_rss_client');
@@ -138,7 +142,7 @@ class block_rss_thumbnails extends block_rss_client {
      * @param array $feedrecords The feed records from the database.
      * @return block_rss_client\output\footer|null The renderable footer or null if none should be displayed.
      */
-    protected function get_footer($feedrecords) {
+    protected function get_footer($feedrecords) : ?block_rss_client\output\footer {
         $footer = null;
 
         if (!empty($this->config->show_channel_link)) {
@@ -171,12 +175,12 @@ class block_rss_thumbnails extends block_rss_client {
     /**
      * Returns the html of a feed to be displaed in the block
      *
-     * @param mixed feedrecord The feed record from the database
-     * @param int maxentries The maximum number of entries to be displayed
-     * @param boolean showtitle Should the feed title be displayed in html
+     * @param mixed $feedrecord The feed record from the database
+     * @param int $maxentries The maximum number of entries to be displayed
+     * @param boolean $showtitle Should the feed title be displayed in html
      * @return block_rss_client\output\feed|null The renderable feed or null of there is an error
      */
-    public function get_feed($feedrecord, $maxentries, $showtitle) {
+    public function get_feed($feedrecord, $maxentries, $showtitle) : ?feed {
         global $CFG;
         require_once($CFG->libdir . '/simplepie/moodle_simplepie.php');
 
@@ -186,7 +190,15 @@ class block_rss_thumbnails extends block_rss_client {
             return null;
         }
 
-        $simplepiefeed = new moodle_simplepie($feedrecord->url);
+        if (!empty($feedrecord->url)) {
+            $simplepiefeed = new moodle_simplepie($feedrecord->url);
+        } else {
+            $simplepiefeed = new moodle_simplepie();
+            $simplepiefeed->set_file($feedrecord->fileurl);
+            $simplepiefeed->enable_cache(false);
+            $simplepiefeed->init();
+
+        }
 
         if (isset($CFG->block_rss_client_timeout)) {
             $simplepiefeed->set_cache_duration($CFG->block_rss_client_timeout * 60);
@@ -209,12 +221,12 @@ class block_rss_thumbnails extends block_rss_client {
         }
 
         if (empty($this->config->title)) {
-            //NOTE: this means the 'last feed' displayed wins the block title - but
-            //this is exiting behaviour..
+            // NOTE: this means the 'last feed' displayed wins the block title - but
+            // this is exiting behaviour..
             $this->title = strip_tags($feedtitle);
         }
 
-        $feed = new \block_rss_client\output\feed($feedtitle, $showtitle, false);
+        $feed = new feed($feedtitle, $showtitle, false);
 
         if ($simplepieitems = $simplepiefeed->get_items(0, $maxentries)) {
             foreach ($simplepieitems as $simplepieitem) {
@@ -231,7 +243,7 @@ class block_rss_thumbnails extends block_rss_client {
                         return $cat->term;
                     }, $simplepieitem->get_categories());
 
-                    $item = new \block_rss_thumbnails\output\item(
+                    $item = new item(
                         $simplepieitem->get_id(),
                         new moodle_url($simplepieitem->get_link()),
                         $simplepieitem->get_title(),
@@ -247,7 +259,7 @@ class block_rss_thumbnails extends block_rss_client {
                 } catch (moodle_exception $e) {
                     // If there is an error with the RSS item, we don't
                     // want to crash the page. Specifically, moodle_url can
-                    // throw an exception of the param is an extremely
+                    // throw an exception if the param is an extremely
                     // malformed url.
                     debugging($e->getMessage());
                 }
@@ -257,7 +269,7 @@ class block_rss_thumbnails extends block_rss_client {
         // Feed image.
         if ($imageurl = $simplepiefeed->get_image_url()) {
             try {
-                $image = new \block_rss_client\output\channel_image(
+                $image = new channel_image(
                     new moodle_url($imageurl),
                     $simplepiefeed->get_image_title(),
                     new moodle_url($simplepiefeed->get_image_link())
@@ -265,7 +277,7 @@ class block_rss_thumbnails extends block_rss_client {
 
                 $feed->set_image($image);
             } catch (moodle_exception $e) {
-                // If there is an error with the RSS image, we don'twant to
+                // If there is an error with the RSS image, we don't want to
                 // crash the page. Specifically, moodle_url can throw an
                 // exception if the param is an extremely malformed url.
                 debugging($e->getMessage());

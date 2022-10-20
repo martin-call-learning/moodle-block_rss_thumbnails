@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+										   xmlns:content="http://purl.org/rss/1.0/modules/content/"
+										   xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+										   xmlns:dc="http://purl.org/dc/elements/1.1/"
+										   xmlns:atom="http://www.w3.org/2005/Atom"
+										   xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+										   xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+										   xmlns:media="http://search.yahoo.com/mrss/">
+
+	<channel>
+		<title>IMT</title>
+		<atom:link href="https://www.imt.fr/feed/" rel="self" type="application/rss+xml" />
+		<link>https://www.imt.fr/imt-accueil/</link>
+		<description>Premier groupe de grandes écoles d&#039;ingénieurs et managers en France</description>
+		<lastBuildDate>Wed, 19 Oct 2022 13:57:11 +0000</lastBuildDate>
+		<language>fr-FR</language>
+		<sy:updatePeriod>
+			hourly	</sy:updatePeriod>
+		<sy:updateFrequency>
+			1	</sy:updateFrequency>
+		<generator>https://wordpress.org/?v=6.0.3</generator>
+		<item>
+			<title>Odyssea : les personnels de l’Institut Mines-Télécom mobilisés pour la lutte contre le cancer du sein</title>
+			<link>https://www.imt.fr/odyssea-les-personnels-de-linstitut-mines-telecom-mobilises-pour-la-lutte-contre-le-cancer-du-sein/</link>
+
+			<dc:creator><![CDATA[Assia RIGAH ABIDEEN]]></dc:creator>
+			<pubDate>Wed, 19 Oct 2022 13:57:11 +0000</pubDate>
+			<category><![CDATA[À la une]]></category>
+			<category><![CDATA[Actualités]]></category>
+			<category><![CDATA[course]]></category>
+			<category><![CDATA[Odyssea]]></category>
+			<guid isPermaLink="false">https://www.imt.fr/?p=89572</guid>
+
+			<description><![CDATA[Dimanche 2 octobre s'est tenu la course Odyssea où l'Institut Mines-Télécom s'est mobilisé pour soutenir la lutte contre le cancer du sein.]]></description>
+
+
+
+			<media:content url="https://www.imt.fr/wp-content/uploads/2022/10/Odyssea2022_montage-groupes-80x80.png" medium="image" />
+		</item>
+		<item>
+			<title>Nouvelles start-up bénéficiaires des fonds de prêt d&#8217;honneur IMT « Numérique » et « Industrie et Energie 4.0 »</title>
+			<link>https://www.imt.fr/nouvelles-start-up-beneficiaires-des-fonds-de-pret-dhonneur-imt-numerique-et-industrie-et-energie-4-0/</link>
+
+			<dc:creator><![CDATA[Assia RIGAH ABIDEEN]]></dc:creator>
+			<pubDate>Tue, 18 Oct 2022 14:34:00 +0000</pubDate>
+			<category><![CDATA[À la une]]></category>
+			<category><![CDATA[Actualités]]></category>
+			<category><![CDATA[prêts d'honneur]]></category>
+			<category><![CDATA[start-up]]></category>
+			<guid isPermaLink="false">https://www.imt.fr/?p=89556</guid>
+
+			<description><![CDATA[Le comité du Fonds IMT Numérique et du Fonds Industrie et Energie 4.0 et se sont réunis le 20 septembre et 11 octobre pour attribuer des prêts d'honneurs à de nouvelles start-up.]]></description>
+
+
+
+			<media:content url="https://www.imt.fr/wp-content/uploads/2022/10/start-up-80x80.jpg" medium="image" />
+		</item>
+		<item>
+			<title>Suivez les Lives IMT pour l’industrie du futur ! Rendez-vous le 20 octobre à 18h30</title>
+			<link>https://www.imt.fr/suivez-les-lives-imt-pour-lindustrie-du-futur/</link>
+
+			<dc:creator><![CDATA[Assia RIGAH ABIDEEN]]></dc:creator>
+			<pubDate>Wed, 05 Oct 2022 12:59:57 +0000</pubDate>
+			<category><![CDATA[À la une]]></category>
+			<category><![CDATA[Actualités]]></category>
+			<category><![CDATA[Live IMT industrie]]></category>
+			<category><![CDATA[Live]]></category>
+			<guid isPermaLink="false">https://www.imt.fr/?p=89147</guid>
+
+			<description><![CDATA[L’Observatoire des métiers et des compétences de l’Institut Mines-Télécom propose, depuis mai, une nouvelle série de rendez-vous mensuels consacrés à l’industrie, portés par les étudiantes et étudiants de ses écoles  : les Lives IMT pour l’industrie du futur !]]></description>
+
+
+
+			<media:content url="https://www.imt.fr/wp-content/uploads/2022/05/les-lives_IMT-industrie-du-futur_archer-80x80.png" medium="image" />
+		</item>
+		<item>
+			<title>2e campagne de recrutement 2022 : rejoignez l&#8217;IMT</title>
+			<link>https://www.imt.fr/2e-campagne-de-recrutement-2022-rejoignez-limt/</link>
+
+			<dc:creator><![CDATA[Anna Da Costa]]></dc:creator>
+			<pubDate>Mon, 03 Oct 2022 10:40:07 +0000</pubDate>
+			<category><![CDATA[À la une]]></category>
+			<category><![CDATA[Actualités]]></category>
+			<category><![CDATA[CDD]]></category>
+			<category><![CDATA[CDI]]></category>
+			<category><![CDATA[emploi]]></category>
+			<category><![CDATA[offre d'emploi]]></category>
+			<category><![CDATA[recrutment]]></category>
+			<guid isPermaLink="false">https://www.imt.fr/?p=89403</guid>
+
+			<description><![CDATA[Plus de 60 offres d’emploi en CDD ou CDI de droit public à pourvoir.]]></description>
+
+
+
+			<media:content url="https://www.imt.fr/wp-content/uploads/2020/03/rejoindre_IMT-80x80.png" medium="image" />
+		</item>
+		<item>
+			<title>Le Fonds IMT Numérique et IGEU fêtent leurs 10 ans</title>
+			<link>https://www.imt.fr/le-fonds-imt-numerique-et-igeu-fetent-leurs-10-ans/</link>
+
+			<dc:creator><![CDATA[Assia RIGAH ABIDEEN]]></dc:creator>
+			<pubDate>Fri, 30 Sep 2022 14:00:40 +0000</pubDate>
+			<category><![CDATA[À la une]]></category>
+			<category><![CDATA[Actualités]]></category>
+			<category><![CDATA[Communiqués de presse]]></category>
+			<category><![CDATA[10 ans]]></category>
+			<category><![CDATA[Fonds IMT Numérique]]></category>
+			<guid isPermaLink="false">https://www.imt.fr/?p=89382</guid>
+
+			<description><![CDATA[Il y a 10 ans, l’Institut Mines Télécom (IMT), la Fondation Mines-Télécom et la Caisse des dépôts créaient Initiative Grandes Ecoles et Université (IGEU) et le Fonds IMT Numérique pour répondre au besoin de financement de jeunes projets d’entreprise.]]></description>
+
+
+
+			<media:content url="https://www.imt.fr/wp-content/uploads/2022/09/10_ans_fonds_honneur-80x80.jpg" medium="image" />
+		</item>
+		<item>
+			<title>L’IMT intègre PariSanté Campus</title>
+			<link>https://www.imt.fr/limt-integre-parisante-campus/</link>
+
+			<dc:creator><![CDATA[Anna Da Costa]]></dc:creator>
+			<pubDate>Wed, 14 Sep 2022 14:04:17 +0000</pubDate>
+			<category><![CDATA[À la une]]></category>
+			<category><![CDATA[Actualités]]></category>
+			<category><![CDATA[Recherche & Innovation]]></category>
+			<category><![CDATA[bien vieillir]]></category>
+			<category><![CDATA[santé digitale]]></category>
+			<guid isPermaLink="false">https://www.imt.fr/?p=89176</guid>
+
+			<description><![CDATA[L’Institut Mines-Télécom consolide son positionnement dans la santé digitale et le bien-être et intègre PariSanté Campus.]]></description>
+
+
+
+			<media:content url="https://www.imt.fr/wp-content/uploads/2022/09/2022_IMT_PariSante-campus_web-80x80.jpg" medium="image" />
+		</item>
+		<item>
+			<title>L’IMT organise des webinaires Orientation vers les métiers de l’industrie du futur</title>
+			<link>https://www.imt.fr/limt-organise-des-webinaires-orientation-vers-les-metiers-de-lindustrie-du-futur/</link>
+
+			<dc:creator><![CDATA[Assia RIGAH ABIDEEN]]></dc:creator>
+			<pubDate>Fri, 09 Sep 2022 12:56:57 +0000</pubDate>
+			<category><![CDATA[À la une]]></category>
+			<category><![CDATA[Actualités]]></category>
+			<category><![CDATA[Formations]]></category>
+			<category><![CDATA[Recherche & Innovation]]></category>
+			<category><![CDATA[industrie]]></category>
+			<category><![CDATA[métier]]></category>
+			<category><![CDATA[webinaire]]></category>
+			<guid isPermaLink="false">https://www.imt.fr/?p=89152</guid>
+
+			<description><![CDATA[L'Observatoire des métiers de l'Institut Mines-Télécom vous invite à suivre les webinaires Orientation "Ose les métiers de l'industrie du futur".]]></description>
+
+
+
+			<media:content url="https://www.imt.fr/wp-content/uploads/2022/09/webinaire_Ose-80x80.jpg" medium="image" />
+		</item>
+		<item>
+			<title>Lancement de la 13e édition du Trophée Start-up Numérique</title>
+			<link>https://www.imt.fr/lancement-de-la-13e-edition-du-trophee-start-up-numerique/</link>
+
+			<dc:creator><![CDATA[Anna Da Costa]]></dc:creator>
+			<pubDate>Thu, 08 Sep 2022 13:08:22 +0000</pubDate>
+			<category><![CDATA[À la une]]></category>
+			<category><![CDATA[Actualités]]></category>
+			<category><![CDATA[Incubation]]></category>
+			<category><![CDATA[Recherche & Innovation]]></category>
+			<guid isPermaLink="false">https://www.imt.fr/?p=89185</guid>
+
+			<description><![CDATA[Les 6 projets lauréats pourront bénéficier d'une incubation d’un an à IMT Starter, de 6 mois d'accélération au sein de l'entreprise marraine et l'équivalent de 100 000 € de prestations et de services. Date limite pour le dépôt des candidatures : 17 octobre 2022]]></description>
+
+
+
+			<media:content url="https://www.imt.fr/wp-content/uploads/2022/09/trophees-start-up-num-2022-80x80.jpg" medium="image" />
+		</item>
+		<item>
+			<title>L’IMT consolide son partenariat avec Singapour dans le domaine de la santé digitale</title>
+			<link>https://www.imt.fr/limt-consolide-son-partenariat-avec-singapour-dans-le-domaine-de-la-sante-digitale/</link>
+
+			<dc:creator><![CDATA[Anna Da Costa]]></dc:creator>
+			<pubDate>Fri, 02 Sep 2022 13:11:44 +0000</pubDate>
+			<category><![CDATA[À la une]]></category>
+			<category><![CDATA[Actualités]]></category>
+			<category><![CDATA[Recherche]]></category>
+			<category><![CDATA[Recherche & Innovation]]></category>
+			<guid isPermaLink="false">https://www.imt.fr/?p=89033</guid>
+
+			<description><![CDATA[L’IMT construit un nouveau partenariat à long terme avec l’I2R dans le domaine de la santé digitale dans le cadre du centre d’excellence en santé digital et du bien-vieillir porté par la direction scientifique]]></description>
+
+
+
+			<media:content url="https://www.imt.fr/wp-content/uploads/2022/09/singapore_astar_fusionopolis-80x80.jpg" medium="image" />
+		</item>
+		<item>
+			<title>Campus Cyber : inauguration des locaux de l’IMT</title>
+			<link>https://www.imt.fr/campus-cyber-inauguration-des-locaux-de-limt/</link>
+
+			<dc:creator><![CDATA[Anna Da Costa]]></dc:creator>
+			<pubDate>Wed, 31 Aug 2022 15:23:01 +0000</pubDate>
+			<category><![CDATA[À la une]]></category>
+			<category><![CDATA[Actualités]]></category>
+			<category><![CDATA[cybersécurité]]></category>
+			<category><![CDATA[Risque et cybersécurité]]></category>
+			<guid isPermaLink="false">https://www.imt.fr/?p=89013</guid>
+
+			<description><![CDATA[L'inauguration des locaux de l'Institut Mines-Télécom sur le campus Cyber a eu lieu ce mercredi 31 août à la Défense.]]></description>
+
+
+
+			<media:content url="https://www.imt.fr/wp-content/uploads/2022/08/20220831_inauguration-cybercampus-80x80.jpg" medium="image" />
+		</item>
+	</channel>
+</rss>

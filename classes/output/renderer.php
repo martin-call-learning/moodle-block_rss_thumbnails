@@ -24,7 +24,8 @@
 
 namespace block_rss_thumbnails\output;
 
-defined('MOODLE_INTERNAL') || die();
+
+use templatable;
 
 /**
  * Renderer for RSS Client block
@@ -37,10 +38,10 @@ class renderer extends \block_rss_client\output\renderer {
     /**
      * Render an RSS feeds block
      *
-     * @param \templatable $block
+     * @param templatable $block
      * @return string|boolean
      */
-    public function render_block(\templatable $block) {
+    public function render_block(templatable $block) {
         $data = $block->export_for_template($this);
 
         return $this->render_from_template('block_rss_thumbnails/block', $data);

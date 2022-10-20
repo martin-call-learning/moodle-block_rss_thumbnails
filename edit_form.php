@@ -35,8 +35,11 @@ require_once($CFG->dirroot.'/blocks/rss_client/edit_form.php');
  */
 class block_rss_thumbnails_edit_form extends block_rss_client_edit_form {
     /**
+     * Creates a form to define caroussel's parameteters
+     *
      * @param HTML_QuickForm $mform
      * @throws coding_exception
+     * @return void
      */
     protected function specific_definition($mform) {
         parent::specific_definition($mform);
@@ -51,7 +54,11 @@ class block_rss_thumbnails_edit_form extends block_rss_client_edit_form {
         $mform->setDefault('config_show_channel_link', false);
         $mform->setType('config_show_channel_link', PARAM_BOOL);
 
-        $mform->addElement('selectyesno', 'config_remove_image_size_suffix', get_string('removeimagesizesuffix', 'block_rss_thumbnails'));
+        $mform->addElement(
+                'selectyesno',
+                'config_remove_image_size_suffix',
+                get_string('removeimagesizesuffix', 'block_rss_thumbnails')
+        );
         $mform->setDefault('config_remove_image_size_suffix', false);
         $mform->setType('config_remove_image_size_suffix', PARAM_BOOL);
     }

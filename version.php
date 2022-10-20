@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021012200;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2012112900;        // Requires this Moodle version.
-$plugin->component = 'block_rss_thumbnails'; // Full name of the plugin (used for diagnostics).
-$plugin->dependencies =  array(
+$plugin->version    = 2022101701;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires   = 2012112900;        // Requires this Moodle version.
+$plugin->component  = 'block_rss_thumbnails'; // Full name of the plugin (used for diagnostics).
+$plugin->dependencies = array(
   'block_rss_client' => ANY_VERSION
 );
