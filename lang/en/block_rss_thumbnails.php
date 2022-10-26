@@ -47,3 +47,4 @@ $string['enableautodiscovery'] = 'Enable auto discovery';
 $string['enableautodiscovery_help'] = 'By checking this, the RSS feed will reload automatically'; // TODO make sure it is correct.
 $string['feeddeleted'] = 'The feed has been successfully deleted';
 $string['configureblock'] = "Click the edit icon above to configure this block to display RSS thumbnails .";
+$string['invalidconfig'] = "It looks like your block configuration is invalid.<br>Make sure you did not lay some empty fields.";

@@ -37,7 +37,7 @@ require_once($CFG->libdir .'/simplepie/moodle_simplepie.php');
  */
 class feed_edit_form extends moodleform {
 
-    // TODO review this file because a lot of things are just none sense.
+    // TODO review this file.
 
     /** @var bool $isadding checks whether the user is adding a new feed or not. */
     protected $isadding;

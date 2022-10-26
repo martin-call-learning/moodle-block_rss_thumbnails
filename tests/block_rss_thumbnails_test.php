@@ -180,6 +180,14 @@ class block_rss_thumbnails_test extends advanced_testcase {
     }
 
     /**
+     * @return void
+     * @covers \block_rss_thumbnails::config_is_valid
+     */
+    public function test_config_is_valid() {
+        // TODO implement test config is valid.
+    }
+
+    /**
      * Get expected items to be returned by the get_feed.
      *
      * @return array[]

@@ -95,6 +95,11 @@ class block_rss_thumbnails extends block_base {
             new moodle_url('/blocks/rss_thumbnails/js/glide/dist/css/glide.core' .
                 (debugging() ? '.min' : '') . '.css'));
 
+        if (!$this->config_is_valid()) {
+            $this->content->text = get_string("invalidconfig", "block_rss_thumbnails");
+            return $this->content;
+        }
+
         if (!isset($this->config)) {
             // The block has yet to be configured - just display configure message in
             // the block if user has permission to configure it.
@@ -107,9 +112,11 @@ class block_rss_thumbnails extends block_base {
         }
 
         // We need this if an user deletes a field in the configuration of the block.
+        /*
         $this->title = $this->config->title ?? self::DEFAULT_TITLE;
         $this->carousseldelay = $this->config->carousseldelay ?? self::DEFAULT_CAROUSSEL_DELAY;
         $this->maxentries = $this->config->numentries ?? self::DEFAULT_MAX_ENTRIES;
+        */
 
         $block = new block($this->get_carousseldelay());
 
@@ -214,5 +221,23 @@ class block_rss_thumbnails extends block_base {
      */
     public function get_carousseldelay(): int {
         return $this->carousseldelay;
+    }
+
+    /**
+     * Checks wether the configuration of the block is valid or not.
+     *
+     * @return bool true if the configuration of the block is valid, false if it's not.
+     */
+    private function config_is_valid(): bool {
+        if (empty($this->config)) {
+            return false;
+        }
+        if (!is_integer($this->config->carousseldelay) || !is_integer($this->config->numentries)) {
+            return false;
+        }
+        if (!$this->config->title) {
+            return false;
+        }
+        return true;
     }
 }
