@@ -18,32 +18,42 @@
  * Contains class block_rss_client\output\block_renderer_html
  *
  * @package   block_rss_thumbnails
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace block_rss_thumbnails\output;
 
-
-use templatable;
+use moodle_page;
+use plugin_renderer_base;
 
 /**
- * Renderer for RSS Client block
+ * Renderer for RSS Thumbnails block, any renderer for an RSS Thumbnails Block should extend this class.
  *
  * @package   block_rss_thumbnails
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class renderer extends \block_rss_client\output\renderer {
-    /**
-     * Render an RSS feeds block
-     *
-     * @param templatable $block
-     * @return string|boolean
-     */
-    public function render_block(templatable $block) {
-        $data = $block->export_for_template($this);
+class renderer extends plugin_renderer_base {
 
-        return $this->render_from_template('block_rss_thumbnails/block', $data);
+    /**
+     * Format an RSS thumbnails item title
+     *
+     * @param string $title
+     * @return string
+     */
+    public function format_item_title($title): string {
+        return break_up_long_words($title, 30);
+    }
+
+    /**
+     * Format an RSS thumbnails item description
+     *
+     * @param string $descritpion
+     * @return string
+     */
+    public function format_item_description($descritpion): string {
+        return $descritpion;
     }
 }
+

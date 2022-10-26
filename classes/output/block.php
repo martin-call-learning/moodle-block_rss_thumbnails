@@ -18,34 +18,41 @@
  * Contains class block_rss_client\output\feed
  *
  * @package   block_rss_thumbnails
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace block_rss_thumbnails\output;
 
+use block_rss_thumbnails;
+use renderable;
 use renderer_base;
+use templatable;
 
 /**
  * Class to help display an RSS Feeds block
  *
  * @package   block_rss_thumbnails
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block extends \block_rss_client\output\block {
+class block implements renderable, templatable {
 
-    /** @var int The delay between two slides */
-    protected int $carousselspeed = 0;
+    /** @var int The delay between two slides of the caroussel (in milliseconds) */
+    private $carousseldelay;
+
+    /** @var array An array of renderable feeds */
+    private $feeds;
+
     /**
-     * Contruct
+     * Contructor
      *
-     * @param int $carousselspeed the caroussel speed of the block
+     * @param int $carousseldelay An integer representing the speed of the carroussel
      * @param array $feeds An array of renderable feeds
      */
-    public function __construct($carousselspeed, array $feeds = array()) {
-        parent::__construct($feeds);
-        $this->carousselspeed = $carousselspeed;
+    public function __construct(int $carousseldelay = block_rss_thumbnails::DEFAULT_CAROUSSEL_DELAY, array $feeds = array()) {
+        $this->feeds = $feeds;
+        $this->carousseldelay = $carousseldelay;
     }
 
     /**
@@ -55,8 +62,33 @@ class block extends \block_rss_client\output\block {
      * @return array
      */
     public function export_for_template(renderer_base $output): array {
-        $data = parent::export_for_template($output);
-        $data['carousselspeed'] = $this->carousselspeed;
+        $data = array(
+            'feeds' => array(),
+            'carousseldelay' => $this->carousseldelay
+        );
+        foreach ($this->feeds as $feed) {
+            $data['feeds'][] = $feed->export_for_template($output);
+        }
+
         return $data;
+    }
+
+    /**
+     * Adds a feed
+     *
+     * @param feed $renderablefeed
+     * @return void
+     */
+    public function add_feed(feed $renderablefeed) {
+        $this->feeds[] = $renderablefeed;
+    }
+
+    /**
+     * Get feeds
+     *
+     * @return array
+     */
+    public function get_feeds(): array {
+        return $this->feeds;
     }
 }

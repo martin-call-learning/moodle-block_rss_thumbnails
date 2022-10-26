@@ -17,16 +17,14 @@
 /**
  * Version details
  *
- * @package    block_rss_thumbnails
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @package   block_rss_thumbnails
+ * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version    = 2022101701;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version    = 2022102500;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires   = 2012112900;        // Requires this Moodle version.
 $plugin->component  = 'block_rss_thumbnails'; // Full name of the plugin (used for diagnostics).
-$plugin->dependencies = array(
-  'block_rss_client' => ANY_VERSION
-);
+$plugin->dependencies = [];

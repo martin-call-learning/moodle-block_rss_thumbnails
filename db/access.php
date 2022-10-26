@@ -15,37 +15,57 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Vetagronews block caps.
+ * RSS_thumbnails block caps.
  *
  * @package   block_rss_thumbnails
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
+$capabilities = [
 
-    'block/rss_thumbnails:myaddinstance' => array(
+    'block/rss_thumbnails:myaddinstance' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
+        'archetypes' => [
             'user' => CAP_ALLOW
-        ),
+        ],
 
         'clonepermissionsfrom' => 'moodle/my:manageblocks'
-    ),
+    ],
 
-    'block/rss_thumbnails:addinstance' => array(
+    'block/rss_thumbnails:addinstance' => [
         'riskbitmask' => RISK_SPAM | RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ],
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+    ],
+
+    'block/rss_thumbnails:manageownfeeds' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ]
+    ],
+
+    'block/rss_thumbnails:manageanyfeeds' => [
+
+        'riskbitmask' => RISK_SPAM,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
+        'archetypes' => [
             'manager' => CAP_ALLOW
-        ),
+        ]
+    ]
 
-        'clonepermissionsfrom' => 'moodle/site:manageblocks'
-    ),
-);
+];

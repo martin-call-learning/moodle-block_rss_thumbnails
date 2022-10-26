@@ -25,12 +25,10 @@ namespace block_rss_thumbnails;
 
 use advanced_testcase;
 use block_base;
-use block_rss_client\task\refreshfeeds;
+use block_rss_thumbnails\output\item;
 use context_system;
-use dml_exception;
 use moodle_page;
 use moodle_simplepie;
-use SimplePie_File;
 use stdClass;
 
 /**
@@ -40,6 +38,8 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_rss_thumbnails_test extends advanced_testcase {
+
+    // TODO IMPORTANT TO CHANGE CAROUSSEL SPEED INTO SMTHING LIKE CAROUSSEL DELAY (in ms).
 
     /**
      * Expected config data.
@@ -80,7 +80,7 @@ class block_rss_thumbnails_test extends advanced_testcase {
             'preferredtitle' => '',
             'description' => 'A feed to test the skip time.',
             'shared' => 0,
-            'url' => '',
+            'url' => 'https://example.com/rss',
             'skiptime' => 0,
             'skipuntil' => 0,
         ];
@@ -142,7 +142,7 @@ class block_rss_thumbnails_test extends advanced_testcase {
 
         $rssfeed = (object) [
             'skipuntil' => 0,
-            'fileurl' => new SimplePie_File($CFG->dirroot . '/blocks/rss_thumbnails/tests/fixtures/sample-feed.xml')
+            'url' => $CFG->dirroot . '/blocks/rss_thumbnails/tests/fixtures/sample-feed.xml'
         ];
 
         $feed = $this->block->get_feed($rssfeed, 5, true);
@@ -163,7 +163,7 @@ class block_rss_thumbnails_test extends advanced_testcase {
         global $CFG;
         $rssfeed = (object) [
             'skipuntil' => 0,
-            'fileurl' => new SimplePie_File($CFG->dirroot . '/blocks/rss_thumbnails/tests/fixtures/sample-feed.xml')
+            'url' => $CFG->dirroot . '/blocks/rss_thumbnails/tests/fixtures/sample-feed.xml'
         ];
 
         $feed = $this->block->get_feed($rssfeed, 5, true);
@@ -172,7 +172,8 @@ class block_rss_thumbnails_test extends advanced_testcase {
         );
         $expecteditems = self::get_expected_items();
         $items = $exporteddata["items"];
-        for ($index = 0; $index < count($expecteditems); $index++) {
+        $expecteditemslength = count($expecteditems);
+        for ($index = 0; $index < $expecteditemslength; $index++) {
             self::assertEquals($expecteditems[$index], $items[$index]);
         }
 
@@ -183,12 +184,10 @@ class block_rss_thumbnails_test extends advanced_testcase {
      *
      * @return array[]
      */
-    final private static function get_expected_items() {
+    final private function get_expected_items() {
         return [
             [
                 "id" => "https://www.imt.fr/?p=89572",
-                "permalink" => "https://www.imt.fr/odyssea-les-personnels-de-linstitut-mines-telecom-mobilises-pour".
-                    "-la-lutte-contre-le-cancer-du-sein/",
                 "timestamp" => strtotime("Wed, 19 Oct 2022 13:57:11 +0000"),
                 "link" => "https://www.imt.fr/odyssea-les-personnels-de-linstitut-mines-telecom-mobilises-pour".
                     "-la-lutte-contre-le-cancer-du-sein/",
@@ -199,13 +198,14 @@ class block_rss_thumbnails_test extends advanced_testcase {
                     "course",
                     "Odyssea"
                 ],
-                "title" => "Odyssea : les personnels de l’Institut Mines-Télécom mobilisés pour la lutte contre le cancer du sein",
+                "title" => item::format_title(
+                    "Odyssea : les personnels de l’Institut Mines-Télécom ".
+                    "mobilisés pour la lutte contre le cancer du sein"
+                ),
                 "description" => "Dimanche 2 octobre s'est tenu la course Odyssea où l'Institut Mines-Télécom s'est mobilisé ".
                     "pour soutenir la lutte contre le cancer du sein."
             ], [
                 "id" => "https://www.imt.fr/?p=89556",
-                "permalink" => "https://www.imt.fr/nouvelles-start-up-beneficiaires-des-fonds-de-pret-dhonneur".
-                    "-imt-numerique-et-industrie-et-energie-4-0/",
                 "timestamp" => strtotime("Tue, 18 Oct 2022 14:34:00 +0000"),
                 "link" => "https://www.imt.fr/nouvelles-start-up-beneficiaires-des-fonds-de-pret-dhonneur".
                     "-imt-numerique-et-industrie-et-energie-4-0/",
@@ -216,13 +216,14 @@ class block_rss_thumbnails_test extends advanced_testcase {
                     "prêts d'honneur",
                     "start-up"
                 ],
-                "title" => "Nouvelles start-up bénéficiaires des fonds de prêt d’honneur IMT « Numérique » ".
-                    "et « Industrie et Energie 4.0 »",
+                "title" => item::format_title(
+                    "Nouvelles start-up bénéficiaires des fonds de prêt d’honneur IMT « Numérique » ".
+                    "et « Industrie et Energie 4.0 »"
+                ),
                 "description" => "Le comité du Fonds IMT Numérique et du Fonds Industrie et Energie 4.0 et se sont réunis".
                     " le 20 septembre et 11 octobre pour attribuer des prêts d'honneurs à de nouvelles start-up."
             ], [
                 "id" => "https://www.imt.fr/?p=89147",
-                "permalink" => "https://www.imt.fr/suivez-les-lives-imt-pour-lindustrie-du-futur/",
                 "timestamp" => strtotime("Wed, 05 Oct 2022 12:59:57 +0000"),
                 "link" => "https://www.imt.fr/suivez-les-lives-imt-pour-lindustrie-du-futur/",
                 "imageurl" => "https://www.imt.fr/wp-content/uploads/2022/05/les-lives_IMT-industrie-du-futur_archer-80x80.png",
@@ -232,13 +233,14 @@ class block_rss_thumbnails_test extends advanced_testcase {
                     "Live IMT industrie",
                     "Live"
                 ],
-                "title" => "Suivez les Lives IMT pour l’industrie du futur ! Rendez-vous le 20 octobre à 18h30",
+                "title" => item::format_title(
+                    "Suivez les Lives IMT pour l’industrie du futur ! Rendez-vous le 20 octobre à 18h30"
+                ),
                 "description" => "L’Observatoire des métiers et des compétences de l’Institut Mines-Télécom propose," .
                     " depuis mai, une nouvelle série de rendez-vous mensuels consacrés à l’industrie, portés par les " .
                     "étudiantes et étudiants de ses écoles  : les Lives IMT pour l’industrie du futur !"
             ], [
                 "id" => "https://www.imt.fr/?p=89403",
-                "permalink" => "https://www.imt.fr/2e-campagne-de-recrutement-2022-rejoignez-limt/",
                 "timestamp" => strtotime("Mon, 03 Oct 2022 10:40:07 +0000"),
                 "link" => "https://www.imt.fr/2e-campagne-de-recrutement-2022-rejoignez-limt/",
                 "imageurl" => "https://www.imt.fr/wp-content/uploads/2020/03/rejoindre_IMT-80x80.png",
@@ -251,11 +253,10 @@ class block_rss_thumbnails_test extends advanced_testcase {
                     "offre d'emploi",
                     "recrutment"
                 ],
-                "title" => "2e campagne de recrutement 2022 : rejoignez l’IMT",
+                "title" => item::format_title("2e campagne de recrutement 2022 : rejoignez l’IMT"),
                 "description" => "Plus de 60 offres d’emploi en CDD ou CDI de droit public à pourvoir."
             ], [
                 "id" => "https://www.imt.fr/?p=89382",
-                "permalink" => "https://www.imt.fr/le-fonds-imt-numerique-et-igeu-fetent-leurs-10-ans/",
                 "timestamp" => strtotime("Fri, 30 Sep 2022 14:00:40 +0000"),
                 "link" => "https://www.imt.fr/le-fonds-imt-numerique-et-igeu-fetent-leurs-10-ans/",
                 "imageurl" => "https://www.imt.fr/wp-content/uploads/2022/09/10_ans_fonds_honneur-80x80.jpg",
@@ -266,7 +267,7 @@ class block_rss_thumbnails_test extends advanced_testcase {
                     "10 ans",
                     "Fonds IMT Numérique"
                 ],
-                "title" => "Le Fonds IMT Numérique et IGEU fêtent leurs 10 ans",
+                "title" => item::format_title("Le Fonds IMT Numérique et IGEU fêtent leurs 10 ans"),
                 "description" => "Il y a 10 ans, l’Institut Mines Télécom (IMT), la Fondation Mines-Télécom et la Caisse des" .
                     " dépôts créaient Initiative Grandes Ecoles et Université (IGEU) et le Fonds IMT Numérique pour répondre au" .
                     " besoin de financement de jeunes projets d’entreprise."

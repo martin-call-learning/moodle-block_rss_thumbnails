@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_rss_client/block
+    @template block_rss_thumbnails/block
 
     Template which defines an RSS Feeds block
 
@@ -30,7 +30,7 @@
 
     Example context (json):
     {
-        "carousselspeed": 1,
+        "carousseldelay" : 10,
         "feeds": [
             {
                 "title": "News from around my living room",
@@ -97,7 +97,7 @@
                     <ul class="glide__slides">
                         {{#items}}
                             <li class="glide__slide">
-                                <a href="{{ link }}" class="d-block position-relative thumbnail">
+                                <a href="{{ link }}" class="position-relative thumbnail">
                                     {{#imageurl}}
                                         <img src="{{imageurl}}" class="img-thumbnail" alt="Item image"/>
                                     {{/imageurl}}
@@ -125,7 +125,7 @@
                 startAt: 0,
                 perView: 4,
                 gap: 20,
-                autoplay: {{ carousselspeed }}
+                autoplay: {{ carousseldelay }}
             }
         );
     });

@@ -18,153 +18,155 @@
  * RSS Thumbnail Block
  *
  * @package   block_rss_thumbnails
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use block_rss_client\output\channel_image;
-use block_rss_client\output\feed;
 use block_rss_thumbnails\output\block;
-use block_rss_thumbnails\output\item;
+use block_rss_thumbnails\output\feed;
+use block_rss_thumbnails\output\footer;
+use block_rss_thumbnails\feed_creator;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot . '/blocks/rss_client/block_rss_client.php');
 
 /**
  * Class block_rss_thumbnails
  *
- * @package    block_rss_thumbnails
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @package   block_rss_thumbnails
+ * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_rss_thumbnails extends block_rss_client {
+class block_rss_thumbnails extends block_base {
 
-    /** @var int The default caroussel speed */
-    const DEFAULT_CAROUSSEL_SPEED = 4000;
+    // TODO Think about adding a slider to allow navigation between feed items.
+    // TODO Add a message when there is no internet connection or if the rss feed can't be found.
 
-    /** @var bool track whether any of the output feeds have recorded failures */
+    /** @var int The default delay between 2 slides */
+    const DEFAULT_CAROUSSEL_DELAY = 4000;
+
+    /** @var string The default name of the block */
+    const DEFAULT_TITLE = "RSS Thumbnail";
+
+    /** @var int The maximum number of item entries for a feed by default */
+    const DEFAULT_MAX_ENTRIES = 5;
+
+
+    /** @var bool Track whether any of the output feeds have recorded failures */
     private $hasfailedfeeds = false;
+
+    /** @var int Defines the delay between two slides of the caroussel (ms) */
+    private $carousseldelay = self::DEFAULT_CAROUSSEL_DELAY;
+
+    /** @var int Defines the number of maximum feeds in the thumbnail */
+    private $maxentries = self::DEFAULT_MAX_ENTRIES;
+
 
     /**
      * Init function
      *
+     * @param int|null $carousseldelay
      * @throws coding_exception
      */
-    public function init() {
+    public function init(?int $carousseldelay = null): void {
+
+        if (!empty($carousseldelay)) {
+            $this->carousseldelay = $carousseldelay;
+        }
+
         $this->title = get_string('pluginname', 'block_rss_thumbnails');
+
+        // Initialise content.
+        $this->content = new stdClass();
+        $this->content->text = '';
+        $this->content->footer = '';
     }
 
     /**
      * Content for the block
      *
-     * @return stdClass|string|null
+     * @return stdClass|null
      * @throws coding_exception
      */
     public function get_content() {
+        global $DB;
+
         $this->page->requires->css(
             new moodle_url('/blocks/rss_thumbnails/js/glide/dist/css/glide.core' .
                 (debugging() ? '.min' : '') . '.css'));
-        global $CFG, $DB;
-
-        if ($this->content !== null) {
-            return $this->content;
-        }
-
-        // Initialise block content object.
-        $this->content = new stdClass;
-        $this->content->text = '';
-        $this->content->footer = '';
-
-        if (empty($this->instance)) {
-            return $this->content;
-        }
 
         if (!isset($this->config)) {
             // The block has yet to be configured - just display configure message in
             // the block if user has permission to configure it.
 
-            if (has_capability('block/rss_client:manageanyfeeds', $this->context)) {
-                $this->content->text = get_string('feedsconfigurenewinstance2', 'block_rss_client');
+            if (has_capability('block/rss_thumbnails:manageanyfeeds', $this->context)) {
+                $this->content->text = get_string('configureblock', 'block_rss_thumbnails');
             }
 
             return $this->content;
         }
 
-        // How many feed items should we display?
-        $maxentries = 5;
-        if (!empty($this->config->shownumentries)) {
-            $maxentries = intval($this->config->shownumentries);
-        } else if (isset($CFG->block_rss_client_num_entries)) {
-            $maxentries = intval($CFG->block_rss_client_num_entries);
-        }
+        // We need this if an user deletes a field in the configuration of the block.
+        $this->title = $this->config->title ?? self::DEFAULT_TITLE;
+        $this->carousseldelay = $this->config->carousseldelay ?? self::DEFAULT_CAROUSSEL_DELAY;
+        $this->maxentries = $this->config->numentries ?? self::DEFAULT_MAX_ENTRIES;
 
-        /* ---------------------------------
-         * Begin Normal Display of Block Content
-         * --------------------------------- */
-
-        $renderer = $this->page->get_renderer('block_rss_thumbnails');
-        $carousselspeed = empty($this->config->carousselspeed) ? self::DEFAULT_CAROUSSEL_SPEED : $this->config->carousselspeed;
-        $block = new block($carousselspeed);
+        $block = new block($this->get_carousseldelay());
 
         if (!empty($this->config->rssid)) {
             list($rssidssql, $params) = $DB->get_in_or_equal($this->config->rssid);
-            $rssfeeds = $DB->get_records_select('block_rss_client', "id $rssidssql", $params);
+            $rssfeeds = $DB->get_records_select('block_rss_thumbnails', "id $rssidssql", $params);
 
-            if (!empty($rssfeeds)) {
-                $showtitle = false;
-                if (count($rssfeeds) > 1) {
-                    // When many feeds show the title for each feed.
-                    $showtitle = true;
+            foreach ($rssfeeds as $feed) {
+                $renderablefeed = $this->get_feed($feed, $this->maxentries);
+                if ($renderablefeed) {
+                    $block->add_feed($renderablefeed);
                 }
-
-                foreach ($rssfeeds as $feed) {
-                    if ($renderablefeed = $this->get_feed($feed, $maxentries, $showtitle)) {
-                        $block->add_feed($renderablefeed);
-                    }
-                }
-
-                $footer = $this->get_footer($rssfeeds);
             }
+
+            $footer = $this->get_footer($rssfeeds);
+        } else {
+            $rssfeeds = array();
         }
 
-        $this->content->text = $renderer->render_block($block);
-        if (isset($footer)) {
-            $this->content->footer = $renderer->render_footer($footer);
-        }
+        $renderer = $this->page->get_renderer('block_rss_thumbnails');
 
+        $this->content = (object) [
+                'text' => $renderer->render($block, $rssfeeds),
+                'footer' => $footer ?? ''
+        ];
         return $this->content;
     }
 
     /**
      * Gets the footer, which is the channel link of the last feed in our list of feeds
      *
-     * @param array $feedrecords The feed records from the database.
-     * @return block_rss_client\output\footer|null The renderable footer or null if none should be displayed.
+     * @param array $feedrecords The feed records from the database
+     * @param int $maxentries The max number of items in the footer feed
+     * @return footer|null The renderable footer or null if none should be displaye
      */
-    protected function get_footer($feedrecords) : ?block_rss_client\output\footer {
+    protected function get_footer($feedrecords, $maxentries = self::DEFAULT_MAX_ENTRIES): ?footer {
         $footer = null;
 
         if (!empty($this->config->show_channel_link)) {
-            global $CFG;
-            require_once($CFG->libdir . '/simplepie/moodle_simplepie.php');
-
             $feedrecord = array_pop($feedrecords);
-            $feed = new moodle_simplepie($feedrecord->url);
+            $feed = feed_creator::create_feed(file_get_contents($feedrecord->url), $maxentries);
             $channellink = new moodle_url($feed->get_link());
 
             if (!empty($channellink)) {
-                $footer = new block_rss_client\output\footer($channellink);
+                $footer = new footer($channellink);
             }
         }
 
         if ($this->hasfailedfeeds) {
-            if (has_any_capability(['block/rss_client:manageownfeeds', 'block/rss_client:manageanyfeeds'], $this->context)) {
+            if (
+                has_any_capability(['block/rss_thumbnails:manageownfeeds', 'block/rss_thumbnails:manageanyfeeds'], $this->context)
+            ) {
                 if ($footer === null) {
-                    $footer = new block_rss_client\output\footer();
+                    $footer = new footer();
                 }
-                $manageurl = new moodle_url('/blocks/rss_client/managefeeds.php',
-                    ['courseid' => $this->page->course->id]);
+                $manageurl = new moodle_url('/blocks/rss_thumbnails/managefeeds.php',
+                        ['courseid' => $this->page->course->id]);
                 $footer->set_failed($manageurl);
             }
         }
@@ -178,11 +180,9 @@ class block_rss_thumbnails extends block_rss_client {
      * @param mixed $feedrecord The feed record from the database
      * @param int $maxentries The maximum number of entries to be displayed
      * @param boolean $showtitle Should the feed title be displayed in html
-     * @return block_rss_client\output\feed|null The renderable feed or null of there is an error
+     * @return block_rss_thumbnails\output\feed|null The renderable feed or null of there is an error
      */
-    public function get_feed($feedrecord, $maxentries, $showtitle) : ?feed {
-        global $CFG;
-        require_once($CFG->libdir . '/simplepie/moodle_simplepie.php');
+    public function get_feed($feedrecord, $maxentries, $showtitle = true): ?feed {
 
         if ($feedrecord->skipuntil) {
             // Last attempt to gather this feed via cron failed - do not try to fetch it now.
@@ -190,101 +190,29 @@ class block_rss_thumbnails extends block_rss_client {
             return null;
         }
 
-        if (!empty($feedrecord->url)) {
-            $simplepiefeed = new moodle_simplepie($feedrecord->url);
-        } else {
-            $simplepiefeed = new moodle_simplepie();
-            $simplepiefeed->set_file($feedrecord->fileurl);
-            $simplepiefeed->enable_cache(false);
-            $simplepiefeed->init();
+        return feed_creator::create_feed_from_url($feedrecord->url, $maxentries, $showtitle);
 
-        }
-
-        if (isset($CFG->block_rss_client_timeout)) {
-            $simplepiefeed->set_cache_duration($CFG->block_rss_client_timeout * 60);
-        }
-
-        if ($simplepiefeed->error()) {
-            if (!defined('BEHAT_SITE_RUNNING')) {
-                // No error while doing the behat tests.
-                debugging($feedrecord->url . ' Failed with code: ' . $simplepiefeed->error());
-            }
-            return null;
-        }
-
-        if (empty($feedrecord->preferredtitle)) {
-            // Simplepie does escape HTML entities.
-            $feedtitle = $this->format_title($simplepiefeed->get_title());
-        } else {
-            // Moodle custom title does not does escape HTML entities.
-            $feedtitle = $this->format_title(s($feedrecord->preferredtitle));
-        }
-
-        if (empty($this->config->title)) {
-            // NOTE: this means the 'last feed' displayed wins the block title - but
-            // this is exiting behaviour..
-            $this->title = strip_tags($feedtitle);
-        }
-
-        $feed = new feed($feedtitle, $showtitle, false);
-
-        if ($simplepieitems = $simplepiefeed->get_items(0, $maxentries)) {
-            foreach ($simplepieitems as $simplepieitem) {
-                try {
-                    $imageurl = null;
-                    $content = $simplepieitem->get_item_tags(SIMPLEPIE_NAMESPACE_MEDIARSS, 'content');
-                    if ($content && !empty($content[0])) {
-                        $imageurl = $content[0]['attribs']['']['url'];
-                        if (!empty($this->config->remove_image_size_suffix)) {
-                            $imageurl = preg_replace('/-[0-9]+x[0-9]+/', '', $imageurl);
-                        }
-                    }
-                    $categories = array_map(function($cat) {
-                        return $cat->term;
-                    }, $simplepieitem->get_categories());
-
-                    $item = new item(
-                        $simplepieitem->get_id(),
-                        new moodle_url($simplepieitem->get_link()),
-                        $simplepieitem->get_title(),
-                        $simplepieitem->get_description(),
-                        new moodle_url($simplepieitem->get_permalink()),
-                        $simplepieitem->get_date('U'),
-                        $this->config->display_description,
-                        $imageurl,
-                        $categories
-                    );
-
-                    $feed->add_item($item);
-                } catch (moodle_exception $e) {
-                    // If there is an error with the RSS item, we don't
-                    // want to crash the page. Specifically, moodle_url can
-                    // throw an exception if the param is an extremely
-                    // malformed url.
-                    debugging($e->getMessage());
-                }
-            }
-        }
-
-        // Feed image.
-        if ($imageurl = $simplepiefeed->get_image_url()) {
-            try {
-                $image = new channel_image(
-                    new moodle_url($imageurl),
-                    $simplepiefeed->get_image_title(),
-                    new moodle_url($simplepiefeed->get_image_link())
-                );
-
-                $feed->set_image($image);
-            } catch (moodle_exception $e) {
-                // If there is an error with the RSS image, we don't want to
-                // crash the page. Specifically, moodle_url can throw an
-                // exception if the param is an extremely malformed url.
-                debugging($e->getMessage());
-            }
-        }
-
-        return $feed;
     }
 
+    /**
+     * Strips a large title to size and adds ... if title too long
+     * This function does not escape HTML entities, so they have to be escaped
+     * before being passed here.
+     *
+     * @param string $title title to shorten
+     * @param int $max max character length of title
+     * @return string title shortened if necessary
+     */
+    public function format_title($title, $max = 64): string {
+        return (core_text::strlen($title) <= $max) ? $title : core_text::substr($title, 0, $max - 3) . '...';
+    }
+
+    /**
+     * Gets the caroussel delay between two slides
+     *
+     * @return int
+     */
+    public function get_carousseldelay(): int {
+        return $this->carousseldelay;
+    }
 }
