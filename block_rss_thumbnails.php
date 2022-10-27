@@ -228,7 +228,7 @@ class block_rss_thumbnails extends block_base {
      *
      * @return bool true if the configuration of the block is valid, false if it's not.
      */
-    private function config_is_valid(): bool {
+    public function config_is_valid(): bool {
         if (empty($this->config)) {
             return false;
         }
