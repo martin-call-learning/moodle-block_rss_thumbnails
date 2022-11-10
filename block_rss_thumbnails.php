@@ -91,6 +91,10 @@ class block_rss_thumbnails extends block_base {
     public function get_content() {
         global $DB;
 
+        if ($this->content != null && !empty($this->content->text)) {
+            return $this->content;
+        }
+
         $this->page->requires->css(
             new moodle_url('/blocks/rss_thumbnails/js/glide/dist/css/glide.core' .
                 (debugging() ? '.min' : '') . '.css'));

@@ -45,7 +45,7 @@ class block_rss_thumbnails_edit_form extends block_edit_form {
      * @return void
      */
     protected function specific_definition($mform) {
-        global $CFG, $DB, $USER, $SESSION;
+        global $CFG, $DB, $USER;
 
         // Fields for editing block contents.
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
@@ -96,7 +96,7 @@ class block_rss_thumbnails_edit_form extends block_edit_form {
                     get_string('choosefeedlabel', 'block_rss_thumbnails'),
                     $rssfeeds
             );
-            $select->setMultiple(true);
+            $select->setMultiple(false);
         } else {
             $mform->addElement('static', 'config_rssid_no_feeds', get_string('choosefeedlabel', 'block_rss_thumbnails'),
                     get_string('nofeeds', 'block_rss_thumbnails'));

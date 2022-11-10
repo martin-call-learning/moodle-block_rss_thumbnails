@@ -39,8 +39,6 @@ use stdClass;
  */
 class block_rss_thumbnails_test extends advanced_testcase {
 
-    // TODO IMPORTANT TO CHANGE CAROUSSEL SPEED INTO SMTHING LIKE CAROUSSEL DELAY (in ms).
-
     /**
      * Expected config data.
      */

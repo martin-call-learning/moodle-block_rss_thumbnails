@@ -36,6 +36,7 @@ $string['feedsaddedit'] = 'Add/edit feeds';
 $string['clientshowchannellinklabel'] = 'Should a link to the original site (channel link) be displayed? (Note that if no feed link is supplied in the news feed then no link will be shown) :';
 $string['managefeeds'] = 'Manage feeds';
 $string['addnewfeed'] = 'Add a new feed';
+$string['editafeed'] = 'Edit a feed';
 $string['feedurl'] = 'URL of the feed';
 $string['feed'] = 'Feed';
 $string['customtitlelabel'] = 'Enter feed\'s title';
