@@ -115,13 +115,6 @@ class block_rss_thumbnails extends block_base {
             return $this->content;
         }
 
-        // We need this if an user deletes a field in the configuration of the block.
-        /*
-        $this->title = $this->config->title ?? self::DEFAULT_TITLE;
-        $this->carousseldelay = $this->config->carousseldelay ?? self::DEFAULT_CAROUSSEL_DELAY;
-        $this->maxentries = $this->config->numentries ?? self::DEFAULT_MAX_ENTRIES;
-        */
-
         $block = new block($this->get_carousseldelay());
 
         if (!empty($this->config->rssid)) {
