@@ -45,7 +45,7 @@ class block_rss_thumbnails_edit_form extends block_edit_form {
      * @return void
      */
     protected function specific_definition($mform) {
-        global $CFG, $DB, $USER, $SESSION;
+        global $CFG, $DB, $USER;
 
         // Fields for editing block contents.
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));

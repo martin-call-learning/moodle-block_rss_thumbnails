@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>js/glide/dist/glide.js</location>
+        <name>Glide</name>
+        <version>3.5.2</version>
+        <license>MIT</license>
+        <licenseversion>1.0</licenseversion>
+    </library>
+</libraries>
