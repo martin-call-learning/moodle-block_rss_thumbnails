@@ -30,14 +30,14 @@
 
     Example context (json):
     {
-        channellink: https://moodle.org,
-        hasfailedfeeds: true,
-        manageurl: https://example.com
+        "channellink": "https://moodle.org",
+        "hasfailedfeeds": true,
+        "manageurl": "https://example.com"
     }
 }}
 <div id="footer">
     <a href="{{ channellink }}">Source site</a>
-{{#hasfailedfeeds}}
-    <p>You have some failed feeds. You can <a href="{{manageurl}}">manage your feeds</a> to try to fix this</p>
-{{/hasfailedfeeds}}
+    {{#hasfailedfeeds}}
+        <p>You have some failed feeds. You can <a href="{{manageurl}}">manage your feeds</a> to try to fix this.</p>
+    {{/hasfailedfeeds}}
 </div>

@@ -62,8 +62,7 @@ class block_rss_thumbnails extends block_base {
     /**
      * Init function
      *
-     * @param int|null $carousseldelay
-     * @throws coding_exception
+git      * @throws coding_exception
      */
     public function init(): void {
 
