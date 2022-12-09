@@ -55,9 +55,6 @@ class block_rss_thumbnails extends block_base {
     /** @var bool Track whether any of the output feeds have recorded failures */
     private $hasfailedfeeds = false;
 
-    /** @var int Defines the delay between two slides of the caroussel (ms) */
-    private $carousseldelay = self::DEFAULT_CAROUSSEL_DELAY;
-
     /** @var int Defines the number of maximum feeds in the thumbnail */
     private $maxentries = self::DEFAULT_MAX_ENTRIES;
 
@@ -68,11 +65,7 @@ class block_rss_thumbnails extends block_base {
      * @param int|null $carousseldelay
      * @throws coding_exception
      */
-    public function init(?int $carousseldelay = null): void {
-
-        if (!empty($carousseldelay)) {
-            $this->carousseldelay = $carousseldelay;
-        }
+    public function init(): void {
 
         $this->title = get_string('pluginname', 'block_rss_thumbnails');
 
@@ -114,8 +107,8 @@ class block_rss_thumbnails extends block_base {
 
             return $this->content;
         }
-
-        $block = new block($this->get_carousseldelay());
+        $carousseldelay = $this->config->carousseldelay ?? self::DEFAULT_CAROUSSEL_DELAY;
+        $block = new block($carousseldelay);
 
         if (!empty($this->config->rssid)) {
             list($rssidssql, $params) = $DB->get_in_or_equal($this->config->rssid);
@@ -137,7 +130,7 @@ class block_rss_thumbnails extends block_base {
 
         $this->content = (object) [
                 'text' => $renderer->render($block, $rssfeeds),
-                'footer' => $footer ?? ''
+                'footer' => $footer ? $renderer->render($footer) : ''
         ];
         return $this->content;
     }
@@ -154,8 +147,7 @@ class block_rss_thumbnails extends block_base {
 
         if (!empty($this->config->show_channel_link)) {
             $feedrecord = array_pop($feedrecords);
-            $feed = feed_creator::create_feed(file_get_contents($feedrecord->url), $maxentries);
-            $channellink = new moodle_url($feed->get_link());
+            $channellink = new moodle_url($feedrecord->url);
 
             if (!empty($channellink)) {
                 $footer = new footer($channellink);
@@ -209,15 +201,6 @@ class block_rss_thumbnails extends block_base {
      */
     public function format_title($title, $max = 64): string {
         return (core_text::strlen($title) <= $max) ? $title : core_text::substr($title, 0, $max - 3) . '...';
-    }
-
-    /**
-     * Gets the caroussel delay between two slides
-     *
-     * @return int
-     */
-    public function get_carousseldelay(): int {
-        return $this->carousseldelay;
     }
 
     /**
