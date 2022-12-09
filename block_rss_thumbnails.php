@@ -51,18 +51,16 @@ class block_rss_thumbnails extends block_base {
     /** @var int The maximum number of item entries for a feed by default */
     const DEFAULT_MAX_ENTRIES = 5;
 
-
     /** @var bool Track whether any of the output feeds have recorded failures */
     private $hasfailedfeeds = false;
 
     /** @var int Defines the number of maximum feeds in the thumbnail */
     private $maxentries = self::DEFAULT_MAX_ENTRIES;
 
-
     /**
      * Init function
      *
-git      * @throws coding_exception
+     * git      * @throws coding_exception
      */
     public function init(): void {
 
@@ -128,8 +126,8 @@ git      * @throws coding_exception
         $renderer = $this->page->get_renderer('block_rss_thumbnails');
 
         $this->content = (object) [
-                'text' => $renderer->render($block, $rssfeeds),
-                'footer' => $footer ? $renderer->render($footer) : ''
+            'text' => $renderer->render($block, $rssfeeds),
+            'footer' => $footer ? $renderer->render($footer) : ''
         ];
         return $this->content;
     }
@@ -161,7 +159,7 @@ git      * @throws coding_exception
                     $footer = new footer();
                 }
                 $manageurl = new moodle_url('/blocks/rss_thumbnails/managefeeds.php',
-                        ['courseid' => $this->page->course->id]);
+                    ['courseid' => $this->page->course->id]);
                 $footer->set_failed($manageurl);
             }
         }
@@ -200,27 +198,6 @@ git      * @throws coding_exception
      */
     public function format_title($title, $max = 64): string {
         return (core_text::strlen($title) <= $max) ? $title : core_text::substr($title, 0, $max - 3) . '...';
-    }
-
-    /**
-     * Checks wether the configuration of the block is valid or not.
-     *
-     * @return bool true if the configuration of the block is valid, false if it's not.
-     */
-    public function config_is_valid(): bool {
-        if (empty($this->config)) {
-            return false;
-        }
-        if (!is_integer($this->config->carousseldelay)) {
-            return false;
-        }
-        if (!is_integer($this->config->numentries)) {
-            return false;
-        }
-        if (!$this->config->title) {
-            return false;
-        }
-        return true;
     }
 
     /**
