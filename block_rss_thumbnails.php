@@ -223,4 +223,25 @@ class block_rss_thumbnails extends block_base {
         }
         return true;
     }
+
+    /**
+     * Checks wether the configuration of the block is valid or not.
+     *
+     * @return bool true if the configuration of the block is valid, false if it's not.
+     */
+    public function config_is_valid(): bool {
+        if (empty($this->config)) {
+            return false;
+        }
+        if (!is_integer($this->config->carousseldelay)) {
+            return false;
+        }
+        if (!is_integer($this->config->numentries)) {
+            return false;
+        }
+        if (!$this->config->title) {
+            return false;
+        }
+        return true;
+    }
 }
