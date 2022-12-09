@@ -59,8 +59,6 @@ class block_rss_thumbnails extends block_base {
 
     /**
      * Init function
-     *
-     * git      * @throws coding_exception
      */
     public function init(): void {
 
