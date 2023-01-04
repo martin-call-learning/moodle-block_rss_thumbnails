@@ -27,6 +27,7 @@ namespace block_rss_thumbnails;
 use block_rss_thumbnails\output\channel_image;
 use block_rss_thumbnails\output\feed;
 use block_rss_thumbnails\output\item;
+use cache;
 use moodle_exception;
 use moodle_url;
 use SimpleXMLElement;
@@ -38,7 +39,7 @@ use SimpleXMLElement;
  * @copyright 202 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class feed_creator {
+class feed_factory {
 
     /** A list of XML entities. */
     const XML_ENTITIES = array(
@@ -70,13 +71,23 @@ class feed_creator {
     /**
      * A function that creates a feed from the given url of an xml file.
      *
+     * Note: we cache the feed content in the block_rss_thumbnails/feeds cache to avoid
+     * fetching the feed at each page load.
+     *
      * @param string $xmlurl the url of the file
      * @param int $maxentries the maximum number of items this feed will have
      * @param bool $showtitle should we display the title of the feed ?
+     * the feed provides the thumbnail image as xxx-80x80.png for example. The real image is xxx.png
      * @return feed|null the feed created or null if an error occurred
      */
     public static function create_feed_from_url(string $xmlurl, int $maxentries, bool $showtitle = true) {
-        return self::create_feed(file_get_contents($xmlurl), $maxentries, $showtitle);
+        $cache = cache::make('block_rss_thumbnails', 'feeds');
+        if ($cache->has($xmlurl)) {
+            return $cache->get($xmlurl);
+        }
+        $feed = self::create_feed(file_get_contents($xmlurl), $maxentries, $showtitle);
+        $cache->set($xmlurl, $feed);
+        return $feed;
     }
 
     /**
@@ -101,19 +112,19 @@ class feed_creator {
         $image = $channel->image;
         if (!empty($image)) {
             $image = new channel_image(
-                    new moodle_url($image->url),
-                    $image->title,
-                    new moodle_url($image->link)
+                new moodle_url($image->url),
+                $image->title,
+                new moodle_url($image->link)
             );
         } else {
             $image = null;
         }
         $feed = new feed(
-                $channel->title,
-                new moodle_url($channel->link),
-                $image,
-                $showtitle,
-                $image ? true : false,
+            (string) $channel->title,
+            new moodle_url($channel->link),
+            $image,
+            $showtitle,
+            $image ? true : false
         );
 
         $counter = 0;
@@ -129,6 +140,16 @@ class feed_creator {
         }
 
         return $feed;
+    }
+
+    /**
+     * Replaces HTML entities that could be in the xml file so SimpleXML will be able to interpret every entity.
+     *
+     * @param string $xmlfile the source file content as a string.
+     * @return string the source file content with only XML entities.
+     */
+    public static function normalize_xml_file(string $xmlfile): string {
+        return str_replace(self::HTML_ENTITIES, self::XML_ENTITIES, $xmlfile);
     }
 
     /**
@@ -161,12 +182,11 @@ class feed_creator {
      *
      * @param SimpleXMLElement $xmlitem The source of the item to be created.
      * @return item The item created.
-     * @throws moodle_exception See the use of {@see moodle_url}
      */
     public static function create_item(SimpleXMLElement $xmlitem) {
         $categories = [];
         foreach ($xmlitem->category as $category) {
-            $categories[] = $category;
+            $categories[] = (string) $category;
         }
 
         $namespaces = $xmlitem->getNamespaces(true);
@@ -180,22 +200,12 @@ class feed_creator {
             $imageurl = new moodle_url("");
         }
 
-        $id = $xmlitem->guid ?? $xmlitem->title;
+        $id = (string) ($xmlitem->guid ?? $xmlitem->title);
         $link = new moodle_url($xmlitem->link);
-        $description = $xmlitem->description;
+        $description = (string) $xmlitem->description;
         $timestamp = strtotime($xmlitem->pubDate);
-        $title = $xmlitem->title;
+        $title = (string) $xmlitem->title;
 
         return new item($id, $link, $description, $timestamp, true, $title, $imageurl, $categories);
-    }
-
-    /**
-     * Replaces HTML entities that could be in the xml file so SimpleXML will be able to interpret every entity.
-     *
-     * @param string $xmlfile the source file content as a string.
-     * @return string the source file content with only XML entities.
-     */
-    public static function normalize_xml_file(string $xmlfile): string {
-        return str_replace(self::HTML_ENTITIES, self::XML_ENTITIES, $xmlfile);
     }
 }

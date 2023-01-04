@@ -1,6 +1,8 @@
 .block_rss_thumbnails .slide-title {
     padding: 0;
     width: 100%;
+}
+.block_rss_thumbnails .slide-info {
     min-height: 200px;
 }
 .block_rss_thumbnails .categories {
@@ -12,4 +14,9 @@
     display: flex;
     justify-content: space-around;
     flex-direction: column;
+}
+
+.block_rss_thumbnails .img-rss-thumbnail {
+    background-size: cover;
+    min-height: 170px;
 }

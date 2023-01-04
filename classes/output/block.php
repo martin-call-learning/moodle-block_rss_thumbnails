@@ -37,7 +37,11 @@ use templatable;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block implements renderable, templatable {
-
+    /**
+     * @var bool $removeimagesuffix should we remove image url suffix to show the large version of the image ? Sometime
+     * the feed provides the thumbnail image as xxx-80x80.png for example. The real image is xxx.png.
+     */
+    public $removeimagesuffix = false;
     /** @var int The delay between two slides of the caroussel (in milliseconds) */
     private $carousseldelay;
 
@@ -45,14 +49,16 @@ class block implements renderable, templatable {
     private $feeds;
 
     /**
-     * Contructor
+     * Constructor
      *
      * @param int $carousseldelay An integer representing the speed of the carroussel
-     * @param array $feeds An array of renderable feeds
+     * @param bool $removeimagesuffix should we remove the image prefix on export_for_template ?
      */
-    public function __construct(int $carousseldelay = block_rss_thumbnails::DEFAULT_CAROUSSEL_DELAY, array $feeds = array()) {
-        $this->feeds = $feeds;
+    public function __construct(int $carousseldelay = block_rss_thumbnails::DEFAULT_CAROUSSEL_DELAY,
+        bool $removeimagesuffix = false) {
+        $this->feeds = [];
         $this->carousseldelay = $carousseldelay;
+        $this->removeimagesuffix = $removeimagesuffix;
     }
 
     /**
@@ -67,6 +73,7 @@ class block implements renderable, templatable {
             'carousseldelay' => $this->carousseldelay
         );
         foreach ($this->feeds as $feed) {
+            $feed->removeimagesuffix = $this->removeimagesuffix;
             $data['feeds'][] = $feed->export_for_template($output);
         }
 

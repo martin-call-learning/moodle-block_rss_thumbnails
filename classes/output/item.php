@@ -37,6 +37,11 @@ use templatable;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item implements renderable, templatable {
+    /**
+     * @var bool $removeimagesuffix should we remove image url suffix to show the large version of the image ? Sometime
+     * the feed provides the thumbnail image as xxx-80x80.png for example. The real image is xxx.png.
+     */
+    public $removeimagesuffix = false;
 
     /** @var string The ID of the item. */
     private $id;
@@ -109,7 +114,7 @@ class item implements renderable, templatable {
             'id' => $this->id,
             'timestamp' => $this->timestamp,
             'link' => clean_param($this->link, PARAM_URL),
-            'imageurl' => (new moodle_url($this->imageurl))->out(),
+            'imageurl' => (new moodle_url($this->get_imageurl()))->out(),
             'categories' => $this->categories
         );
 
@@ -185,10 +190,12 @@ class item implements renderable, templatable {
 
     /**
      * Gets the imageurl of the item.
-     *
      * @return string|null the image url of the item.
      */
     public function get_imageurl(): ?string {
+        if ($this->removeimagesuffix) {
+            return preg_replace('/-[0-9]+x[0-9]+/', '', $this->imageurl);
+        }
         return $this->imageurl;
     }
 

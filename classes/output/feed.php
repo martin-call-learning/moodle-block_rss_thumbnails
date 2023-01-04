@@ -37,6 +37,11 @@ use templatable;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feed implements renderable, templatable {
+    /**
+     * @var bool $removeimagesuffix should we remove image url suffix to show the large version of the image ? Sometime
+     * the feed provides the thumbnail image as xxx-80x80.png for example. The real image is xxx.png.
+     */
+    public $removeimagesuffix = false;
 
     /** @var string|null The feed's title. */
     private $title;
@@ -124,7 +129,6 @@ class feed implements renderable, templatable {
     public function get_title() {
         return $this->title;
     }
-
     /**
      * Export this for use in a mustache template context.
      *
@@ -141,6 +145,7 @@ class feed implements renderable, templatable {
         $data['image'] = ($this->showimage && $this->image) ? $this->image->export_for_template($output) : null;
 
         foreach ($this->items as $item) {
+            $item->removeimagesuffix = $this->removeimagesuffix;
             $data['items'][] = $item->export_for_template($output);
         }
 

@@ -90,25 +90,27 @@
     }
 }}
 <div id="block-rss-thumbnails-{{uniqid}}">
-{{#feeds}}
+    {{#feeds}}
         <div class="container-fluid">
             <div class="glide d-none">
                 <div class="glide__track" data-glide-el="track">
                     <ul class="glide__slides">
                         {{#items}}
                             <li class="glide__slide">
-                                <a href="{{ link }}" class="position-relative thumbnail">
+                                <a href="{{ link }}" class="position-relative">
                                     {{#imageurl}}
-                                        <img src="{{imageurl}}" class="img-thumbnail" alt="Item image"/>
+                                        <div class="img-rss-thumbnail"  style="background-image: url({{imageurl}});"></div>
                                     {{/imageurl}}
-                                    <div class="slide-title d-block">
-                                        <div class="font-weight-bolder  d-none d-md-block">{{ title }}</div>
-                                        <div class="text-truncate d-none d-md-block">{{#userdate}} {{timestamp}}, {{#str}} strftimedate {{/str}} {{/userdate}}</div>
-                                    </div>
-                                    <div class="categories font-italic d-none d-md-inline-block m-2">
-                                        {{#categories}}
-                                            <span class="text-uppercase">{{ . }}</span>
-                                        {{/categories}}
+                                    <div class="slide-info">
+                                        <div class="slide-title d-block mt-2">
+                                            <div class="font-weight-bolder d-block pt-1">{{ title }}</div>
+                                            <div class="text-truncate d-none d-md-block">{{#userdate}} {{timestamp}}, {{#str}} strftimedate {{/str}} {{/userdate}}</div>
+                                        </div>
+                                        <div class="categories font-italic d-none d-md-inline-block m-y-2">
+                                            {{#categories}}
+                                                <span class="text-uppercase">{{ . }}</span>
+                                            {{/categories}}
+                                        </div>
                                     </div>
                                 </a>
                             </li>
@@ -117,17 +119,28 @@
                 </div>
             </div>
         </div>
-{{/feeds}}
+    {{/feeds}}
 {{#js}}
     require(['block_rss_thumbnails/glide'], function(glide) {
-        glide('#block-rss-thumbnails-{{uniqid}} .glide', {
-                type: 'carousel',
-                startAt: 0,
-                perView: 4,
-                gap: 20,
-                autoplay: {{ carousseldelay }}
-            }
-        );
+    glide('#block-rss-thumbnails-{{uniqid}} .glide', {
+    type: 'carousel',
+    startAt: 0,
+    perView: 4,
+    gap: 20,
+    autoplay: {{ carousseldelay }},
+    breakpoints: {
+        '575': {
+            perView: 1
+        },
+        '767': {
+            perView: 2
+        },
+        '991': {
+            perView: 3
+        }
+        }
+    }
+    );
     });
 {{/js}}
 </div>

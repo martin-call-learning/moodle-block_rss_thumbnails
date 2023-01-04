@@ -35,7 +35,6 @@ use plugin_renderer_base;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends plugin_renderer_base {
-
     /**
      * Format an RSS thumbnails item title
      *
@@ -54,6 +53,16 @@ class renderer extends plugin_renderer_base {
      */
     public function format_item_description($descritpion): string {
         return $descritpion;
+    }
+
+    /**
+     * Format image url
+     * @param string $imageurl
+     * @param bool $removeimagesuffix should we remove the image suffix ?
+     * @return string
+     */
+    public function format_image_url(string $imageurl, $removeimagesuffix): string {
+        return $imageurl;
     }
 }
 

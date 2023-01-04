@@ -25,8 +25,6 @@
 namespace block_rss_thumbnails;
 
 use advanced_testcase;
-use block_rss_thumbnails\feed_creator;
-use block_rss_thumbnails\output\feed;
 use block_rss_thumbnails\output\item;
 
 /**
@@ -35,19 +33,19 @@ use block_rss_thumbnails\output\item;
  * @copyright 2022 - CALL Learning - Martin CORNU-MANSUY <martin@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class feed_creator_test extends advanced_testcase {
+class feed_factory_test extends advanced_testcase {
 
     /**
-     * Tests that the {@see feed_creator::create_feed()} method works fine
+     * Tests that the {@see feed_factory::create_feed()} method works fine
      *
      * @return void
-     * @covers \block_rss_thumbnails\feed_creator::create_feed
+     * @covers \block_rss_thumbnails\feed_factory::create_feed
      */
     public function test_create_feed() {
         global $CFG;
 
         $maxentries = 5;
-        $feed = feed_creator::create_feed_from_url(
+        $feed = feed_factory::create_feed_from_url(
                 $CFG->dirroot . '/blocks/rss_thumbnails/tests/fixtures/sample-feed.xml',
                 $maxentries
         );
@@ -57,15 +55,15 @@ class feed_creator_test extends advanced_testcase {
     }
 
     /**
-     * Tests that the {@see feed_creator::create_feed()} method returns null if an invalid xml file is given
+     * Tests that the {@see feed_factory::create_feed()} method returns null if an invalid xml file is given
      *
      * @return void
-     * @covers \block_rss_thumbnails\feed_creator::create_feed
+     * @covers \block_rss_thumbnails\feed_factory::create_feed
      */
     public function test_create_feed_returns_null_if_invalid_xml() {
         global $CFG;
 
-        $feed = feed_creator::create_feed(
+        $feed = feed_factory::create_feed(
             file_get_contents($CFG->dirroot . '/blocks/rss_thumbnails/tests/fixtures/sample-item.xml'),
             5
         );
@@ -73,16 +71,16 @@ class feed_creator_test extends advanced_testcase {
     }
 
     /**
-     * Tests that the {@see feed_creator::create_item()} method works fine
+     * Tests that the {@see feed_factory::create_item()} method works fine
      *
      * @return void
      * @throws moodle_exception
-     * @covers \block_rss_thumbnails\feed_creator::create_item
+     * @covers \block_rss_thumbnails\feed_factory::create_item
      */
     public function test_create_item() {
         global $CFG;
 
-        $item = feed_creator::create_item(
+        $item = feed_factory::create_item(
                 simplexml_load_file($CFG->dirroot . '/blocks/rss_thumbnails/tests/fixtures/sample-item.xml')->item
         );
         self::assertEquals(item::format_title("La Chaire « Valeurs et Politiques des Informations Personnelles »".

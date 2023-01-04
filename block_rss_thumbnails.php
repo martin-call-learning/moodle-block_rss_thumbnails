@@ -25,7 +25,7 @@
 use block_rss_thumbnails\output\block;
 use block_rss_thumbnails\output\feed;
 use block_rss_thumbnails\output\footer;
-use block_rss_thumbnails\feed_creator;
+use block_rss_thumbnails\feed_factory;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -53,7 +53,6 @@ class block_rss_thumbnails extends block_base {
 
     /** @var bool Track whether any of the output feeds have recorded failures */
     private $hasfailedfeeds = false;
-
     /** @var int Defines the number of maximum feeds in the thumbnail */
     private $maxentries = self::DEFAULT_MAX_ENTRIES;
 
@@ -103,7 +102,7 @@ class block_rss_thumbnails extends block_base {
             return $this->content;
         }
         $carousseldelay = $this->config->carousseldelay ?? self::DEFAULT_CAROUSSEL_DELAY;
-        $block = new block($carousseldelay);
+        $block = new block($carousseldelay, $this->config->remove_image_size_suffix ?? false);
 
         if (!empty($this->config->rssid)) {
             list($rssidssql, $params) = $DB->get_in_or_equal($this->config->rssid);
@@ -117,14 +116,11 @@ class block_rss_thumbnails extends block_base {
             }
 
             $footer = $this->get_footer($rssfeeds);
-        } else {
-            $rssfeeds = array();
         }
 
         $renderer = $this->page->get_renderer('block_rss_thumbnails');
-
         $this->content = (object) [
-            'text' => $renderer->render($block, $rssfeeds),
+            'text' => $renderer->render($block),
             'footer' => $footer ? $renderer->render($footer) : ''
         ];
         return $this->content;
@@ -180,9 +176,20 @@ class block_rss_thumbnails extends block_base {
             $this->hasfailedfeeds = true;
             return null;
         }
+        return feed_factory::create_feed_from_url($feedrecord->url, $maxentries, $showtitle);
 
-        return feed_creator::create_feed_from_url($feedrecord->url, $maxentries, $showtitle);
+    }
 
+    /**
+     * Serialize and store config data
+     *
+     * @param stdClass $data
+     * @param false $nolongerused
+     * @throws coding_exception
+     */
+    public function instance_config_save($data, $nolongerused = false) {
+        parent::instance_config_save($data, $nolongerused);
+        cache_helper::purge_by_event('block_rss_thumbnails/expiresfeed');
     }
 
     /**
@@ -197,7 +204,6 @@ class block_rss_thumbnails extends block_base {
     public function format_title($title, $max = 64): string {
         return (core_text::strlen($title) <= $max) ? $title : core_text::substr($title, 0, $max - 3) . '...';
     }
-
     /**
      * Checks wether the configuration of the block is valid or not.
      *
