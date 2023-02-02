@@ -182,7 +182,7 @@ class block_rss_thumbnails_test extends advanced_testcase {
      *
      * @return array[]
      */
-    final private function get_expected_items() {
+    private function get_expected_items() {
         return [
             [
                 "id" => "https://www.imt.fr/?p=89572",

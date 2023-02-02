@@ -213,10 +213,10 @@ class block_rss_thumbnails extends block_base {
         if (empty($this->config)) {
             return false;
         }
-        if (!is_integer($this->config->carousseldelay)) {
+        if (empty($this->config->carousseldelay) || !is_integer($this->config->carousseldelay)) {
             return false;
         }
-        if (!is_integer($this->config->numentries)) {
+        if (empty($this->config->numentries) || !is_integer($this->config->numentries)) {
             return false;
         }
         if (!$this->config->title) {
